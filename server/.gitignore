@@ -1,0 +1,33 @@
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# TypeScript build output
+dist
+build
+*.js.map
+*.d.ts
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+logs
+*.log
+
+# Editor/IDE specific files
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+
+# Test coverage
+coverage
