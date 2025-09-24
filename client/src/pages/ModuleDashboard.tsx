@@ -265,7 +265,7 @@ export const ModuleDashboard = () => {
             {/* Modal crear módulo */}
             {activeModal === "module" && (
                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                  <div className="relative p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
+                  <div className="relative p-6 rounded-xl shadow-lg w-96 max-w-[90vw] bg-white dark:bg-accent">
                      <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold">Crear módulo</h2>
                         <X
@@ -315,14 +315,10 @@ export const ModuleDashboard = () => {
                            )}
                         </div>
 
-                        <button
-                           type="submit"
-                           disabled={isLoading}
-                           className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
-                        >
+                        <Button type="submit" disabled={isLoading} className="w-full">
                            <Plus size={18} />
                            {isLoading ? "Creando..." : "Crear módulo"}
-                        </button>
+                        </Button>
                      </form>
                   </div>
                </div>
