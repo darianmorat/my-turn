@@ -1,0 +1,241 @@
+import api from "@/api/axios";
+import { toast } from "react-toastify";
+import { create } from "zustand";
+
+export type TurnStatus = "waiting" | "being_served" | "completed" | "cancelled";
+
+export type User = {
+   id: number;
+   name: string;
+   nationalId: string;
+   createdAt: string;
+};
+
+export type Module = {
+   id: number;
+   name: string;
+   description?: string;
+   isActive: boolean;
+   agentName?: string;
+};
+
+export type Turn = {
+   id: number;
+   userId: number;
+   moduleId?: number;
+   queueNumber: number;
+   ticketCode: string;
+   status: TurnStatus;
+
+   createdAt: string;
+   calledAt?: string;
+   completedAt?: string;
+
+   serviceDate: string;
+
+   user: User;
+   module?: Module;
+};
+
+export type QueueStats = {
+   waiting: number;
+   beingServed: number;
+   completed: number;
+   cancelled: number;
+   nextTicket: string | null;
+   totalToday: number;
+};
+
+type QueueStore = {
+   // State
+   waitingTurns: Turn[];
+   currentlyServed: Turn[];
+   modules: Module[];
+   stats: QueueStats | null;
+   isLoading: boolean;
+
+   // Reception actions
+   createTurn: (nationalId: string) => Promise<Turn | null>;
+   getWaitingTurns: () => Promise<void>;
+   getStats: () => Promise<void>;
+
+   // Agent actions
+   callNext: (moduleId: number) => Promise<Turn | null>;
+   completeTurn: (turnId: number) => Promise<void>;
+   getCurrentlyServed: () => Promise<void>;
+
+   // System actions
+   getModules: () => Promise<void>;
+   initializeSystem: () => Promise<void>;
+
+   // Utils
+   refreshAll: () => Promise<void>;
+};
+
+export const useQueueStore = create<QueueStore>((set, get) => ({
+   // Initial state
+   waitingTurns: [],
+   currentlyServed: [],
+   modules: [],
+   stats: null,
+   isLoading: false,
+
+   createTurn: async (nationalId: string) => {
+      // if (!nationalId.trim()) {
+      //    toast.error("Please enter a National ID");
+      //    return null;
+      // }
+
+      set({ isLoading: true });
+      try {
+         const body = { nationalId: nationalId };
+         const res = await api.post("/queue/create", body);
+
+         if (res.data.success) {
+            const turn = res.data.turn;
+            toast.success(res.data.message);
+
+            get().getWaitingTurns();
+
+            return turn;
+         }
+      } catch (error) {
+         const message = error?.response?.data?.message || "Failed to create turn";
+         toast.error(message);
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   getWaitingTurns: async () => {
+      try {
+         const res = await api.get("/queue/waiting");
+
+         if (res.data.success) {
+            set({ waitingTurns: res.data.turns });
+         }
+      } catch (error) {
+         console.error("Failed to fetch waiting turns:", error);
+      }
+   },
+
+   // Get currently served turns
+   getCurrentlyServed: async () => {
+      try {
+         const res = await api.get("/queue/currently-served");
+
+         if (res.data.success) {
+            set({ currentlyServed: res.data.turns });
+         }
+      } catch (error) {
+         console.error("Failed to fetch currently served turns:", error);
+      }
+   },
+
+   // Call next person to module (for agents)
+   callNext: async (moduleId: number) => {
+      try {
+         set({ isLoading: true });
+         const res = await api.post("/queue/call-next", { moduleId });
+
+         if (res.data.success) {
+            if (res.data.turn) {
+               toast.success(res.data.message);
+
+               // Refresh both waiting and currently served
+               await Promise.all([
+                  get().getWaitingTurns(),
+                  get().getCurrentlyServed(),
+                  get().getStats(),
+               ]);
+
+               return res.data.turn;
+            } else {
+               toast.info("No one waiting in queue");
+               return null;
+            }
+         }
+         return null;
+      } catch (error) {
+         const message = error?.response?.data?.message || "Failed to call next person";
+         toast.error(message);
+         return null;
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   // Complete service (for agents)
+   completeTurn: async (turnId: number) => {
+      try {
+         set({ isLoading: true });
+         const res = await api.post(`/queue/complete/${turnId}`);
+
+         if (res.data.success) {
+            toast.success(res.data.message);
+
+            // Refresh currently served and stats
+            await Promise.all([get().getCurrentlyServed(), get().getStats()]);
+         }
+      } catch (error) {
+         const message = error?.response?.data?.message || "Failed to complete service";
+         toast.error(message);
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   // Get queue statistics
+   getStats: async () => {
+      try {
+         const res = await api.get("/queue/stats");
+
+         if (res.data.success) {
+            set({ stats: res.data.stats });
+         }
+      } catch (error) {
+         console.error("Failed to fetch queue stats:", error);
+      }
+   },
+
+   // Get all modules
+   getModules: async () => {
+      try {
+         const res = await api.get("/queue/modules");
+
+         if (res.data.success) {
+            set({ modules: res.data.modules });
+         }
+      } catch (error) {
+         console.error("Failed to fetch modules:", error);
+      }
+   },
+
+   // Initialize system
+   initializeSystem: async () => {
+      try {
+         set({ isLoading: true });
+         const res = await api.post("/queue/initialize");
+
+         if (res.data.success) {
+            toast.success(res.data.message);
+            await get().getModules();
+         }
+      } catch (error) {
+         const message = error?.response?.data?.message || "Failed to initialize system";
+         toast.error(message);
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   // Refresh all data
+   refreshAll: async () => {
+      await Promise.all([
+         get().getWaitingTurns(),
+         get().getCurrentlyServed(),
+         get().getStats(),
+         get().getModules(),
+      ]);
+   },
+}));

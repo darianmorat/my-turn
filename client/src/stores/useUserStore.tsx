@@ -7,8 +7,14 @@ type User = {
    name: string;
 };
 
+type Users = {
+   id: string;
+   nationalId: string;
+   name: string;
+};
+
 type Store = {
-   users: User[];
+   users: Users[];
    getUsers: () => Promise<void>;
    createUser: (values: User) => Promise<void>;
 };
