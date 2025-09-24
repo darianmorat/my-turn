@@ -66,8 +66,14 @@ export const queueService = {
       }
    },
 
+   // Module actions
    getAllModules: async () => {
       return await db.select().from(modules);
+   },
+
+   createModule: async (name: string, description: string) => {
+      const module = await db.insert(modules).values({ name, description }).returning();
+      return module;
    },
 
    getNextInQueue: async () => {
@@ -209,22 +215,5 @@ export const queueService = {
          nextTicket: nextInQueue?.ticketCode || null,
          totalToday: totalToday[0].count,
       };
-   },
-
-   // PENDING 
-   // the recepcionist should be able to crete them instead of this...
-   initializeModules: async () => {
-      const existingModules = await db.select().from(modules);
-
-      if (existingModules.length === 0) {
-         const moduleData = [
-            { name: "Module 1", description: "Service Module 1" },
-            { name: "Module 2", description: "Service Module 2" },
-            { name: "Module 3", description: "Service Module 3" },
-            { name: "Module 4", description: "Service Module 4" },
-         ];
-
-         await db.insert(modules).values(moduleData);
-      }
    },
 };

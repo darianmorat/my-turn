@@ -14,13 +14,13 @@ export const QueueDisplayBoard = () => {
       getStats,
    } = useQueueStore();
 
-   // Auto-refresh every 5 seconds
+   // Auto-refresco cada 5 segundos
    useEffect(() => {
       const fetchData = async () => {
          await Promise.all([
-            getWaitingTurns(),
-            getCurrentlyServed(),
             getModules(),
+            getCurrentlyServed(),
+            getWaitingTurns(),
             getStats(),
          ]);
       };
@@ -32,7 +32,7 @@ export const QueueDisplayBoard = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
-   // Get next 3 people in queue with predicted modules
+   // Obtener los próximos 3 turnos en cola con módulos previstos
    const getNextTurnsWithModules = () => {
       const availableModules = modules.filter((m) => m.isActive);
       const busyModuleIds = currentlyServed.map((turn) => turn.moduleId).filter(Boolean);
@@ -44,12 +44,10 @@ export const QueueDisplayBoard = () => {
          let predictedModule = null;
 
          if (index === 0 && availableModuleIds.length > 0) {
-            // First person goes to first available module
             predictedModule = availableModules.find(
                (m) => m.id === availableModuleIds[0],
             );
          } else if (index < availableModuleIds.length) {
-            // Others go to remaining available modules
             predictedModule = availableModules.find(
                (m) => m.id === availableModuleIds[index],
             );
@@ -63,29 +61,33 @@ export const QueueDisplayBoard = () => {
    };
 
    const nextTurns = getNextTurnsWithModules();
-   const currentTime = new Date().toLocaleTimeString();
+   const currentTime = new Date().toLocaleTimeString("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+   });
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 text-white p-8">
-         {/* Header */}
+         {/* Encabezado */}
          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2">Queue Management System</h1>
-            <div className="flex items-center justify-center gap-4 text-lg">
+            <h1 className="text-4xl font-bold mb-2">Sistema de Gestión de Turnos</h1>
+            <div className="flex items-center justify-center gap-12">
                <div className="flex items-center gap-2">
                   <Clock size={20} />
                   <span>{currentTime}</span>
                </div>
                <div className="flex items-center gap-2">
                   <Users size={20} />
-                  <span>{stats?.waiting || 0} waiting</span>
+                  <span>{stats?.waiting || 0} en espera</span>
                </div>
             </div>
          </div>
 
-         {/* Currently Being Served */}
+         {/* Actualmente Atendidos */}
          <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-center">
-               🏢 Currently Being Served
+               Actualmente Atendidos:
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                {modules.map((module) => {
@@ -113,14 +115,23 @@ export const QueueDisplayBoard = () => {
                                     {serving.user.name}
                                  </div>
                                  <div className="text-xs opacity-75 mt-1">
-                                    Serving since{" "}
-                                    {new Date(serving.calledAt!).toLocaleTimeString()}
+                                    Atendiendo desde{" "}
+                                    {new Date(serving.calledAt!).toLocaleTimeString(
+                                       "es-CO",
+                                       {
+                                          hour: "numeric",
+                                          minute: "numeric",
+                                          hour12: true,
+                                       },
+                                    )}
                                  </div>
                               </div>
                            ) : (
                               <div className="text-gray-300">
-                                 <div className="text-xl mb-1">Available</div>
-                                 <div className="text-sm">Waiting for next customer</div>
+                                 <div className="text-xl mb-1">Disponible</div>
+                                 <div className="text-sm">
+                                    Esperando al siguiente cliente
+                                 </div>
                               </div>
                            )}
                         </div>
@@ -130,15 +141,15 @@ export const QueueDisplayBoard = () => {
             </div>
          </div>
 
-         {/* Next in Queue */}
+         {/* Próximos en la Cola */}
          <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-center">
-               🎯 Next to Be Called
+               Próximos a Ser Llamados:
             </h2>
 
             {nextTurns.length === 0 ? (
                <div className="text-center py-12 bg-gray-800 rounded-xl">
-                  <div className="text-xl text-gray-400">No one waiting in queue</div>
+                  <div className="text-gray-400">No hay personas en la cola</div>
                </div>
             ) : (
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -153,7 +164,7 @@ export const QueueDisplayBoard = () => {
                      >
                         {index === 0 && (
                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                              NEXT
+                              SIGUIENTE
                            </div>
                         )}
 
@@ -163,7 +174,7 @@ export const QueueDisplayBoard = () => {
                            </div>
                            <div className="text-lg mb-2">{turn.user.name}</div>
                            <div className="text-sm opacity-75 mb-3">
-                              Position: #{turn.queueNumber}
+                              Posición: #{turn.queueNumber}
                            </div>
 
                            {turn.predictedModule && (
@@ -177,7 +188,7 @@ export const QueueDisplayBoard = () => {
 
                            {!turn.predictedModule && (
                               <div className="bg-gray-600 rounded-lg p-2 text-sm">
-                                 Waiting for available module
+                                 Esperando un módulo disponible
                               </div>
                            )}
                         </div>
@@ -187,24 +198,24 @@ export const QueueDisplayBoard = () => {
             )}
          </div>
 
-         {/* Queue Statistics */}
+         {/* Estadísticas de la Cola */}
          {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                <div className="bg-blue-800 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold">{stats.waiting}</div>
-                  <div className="text-sm opacity-75">Waiting</div>
+                  <div className="text-sm opacity-75">En espera</div>
                </div>
                <div className="bg-green-800 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold">{stats.beingServed}</div>
-                  <div className="text-sm opacity-75">Being Served</div>
+                  <div className="text-sm opacity-75">En atención</div>
                </div>
                <div className="bg-purple-800 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold">{stats.completed}</div>
-                  <div className="text-sm opacity-75">Completed</div>
+                  <div className="text-sm opacity-75">Completados</div>
                </div>
                <div className="bg-gray-800 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold">{stats.totalToday}</div>
-                  <div className="text-sm opacity-75">Total Today</div>
+                  <div className="text-sm opacity-75">Total de Hoy</div>
                </div>
             </div>
          )}

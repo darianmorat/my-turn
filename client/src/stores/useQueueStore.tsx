@@ -5,14 +5,14 @@ import { create } from "zustand";
 export type TurnStatus = "waiting" | "being_served" | "completed" | "cancelled";
 
 export type User = {
-   id: number;
+   id: string;
    name: string;
    nationalId: string;
    createdAt: string;
 };
 
 export type Module = {
-   id: number;
+   id: string;
    name: string;
    description?: string;
    isActive: boolean;
@@ -20,9 +20,9 @@ export type Module = {
 };
 
 export type Turn = {
-   id: number;
-   userId: number;
-   moduleId?: number;
+   id: string;
+   userId: string;
+   moduleId?: string;
    queueNumber: number;
    ticketCode: string;
    status: TurnStatus;
@@ -60,13 +60,13 @@ type QueueStore = {
    getStats: () => Promise<void>;
 
    // Agent actions
-   callNext: (moduleId: number) => Promise<Turn | null>;
-   completeTurn: (turnId: number) => Promise<void>;
+   callNext: (moduleId: string) => Promise<Turn | null>;
+   completeTurn: (turnId: string) => Promise<void>;
    getCurrentlyServed: () => Promise<void>;
 
    // System actions
    getModules: () => Promise<void>;
-   initializeSystem: () => Promise<void>;
+   createModule: (name: string, description: string) => Promise<void>;
 
    // Utils
    refreshAll: () => Promise<void>;
@@ -198,7 +198,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   // Get all modules
+   // Module actions
    getModules: async () => {
       try {
          const res = await api.get("/queue/modules");
@@ -211,21 +211,19 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   // Initialize system
-   initializeSystem: async () => {
+   createModule: async (name, description) => {
       try {
-         set({ isLoading: true });
-         const res = await api.post("/queue/initialize");
+         const body = {
+            name,
+            description,
+         };
+         const res = await api.post("/queue/modules/create", body);
 
          if (res.data.success) {
-            toast.success(res.data.message);
-            await get().getModules();
+            get().getModules();
          }
       } catch (error) {
-         const message = error?.response?.data?.message || "Failed to initialize system";
-         toast.error(message);
-      } finally {
-         set({ isLoading: false });
+         console.error("Failed to create modules:", error);
       }
    },
 

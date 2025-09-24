@@ -2,12 +2,12 @@ import express from "express";
 import {
    callNext,
    completeTurn,
+   createModule,
    createTurn,
    getCurrentlyServed,
    getModules,
    getQueueStats,
    getWaitingTurns,
-   initializeSystem,
 } from "../controllers/queue.controller";
 
 const router = express.Router();
@@ -24,6 +24,6 @@ router.get("/currently-served", getCurrentlyServed);
 
 // System routes
 router.get("/modules", getModules);
-router.post("/initialize", initializeSystem);
+router.post("/modules/create", createModule);
 
 export default router;

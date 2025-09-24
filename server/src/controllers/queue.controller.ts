@@ -110,7 +110,7 @@ export const completeTurn = async (req: Request, res: Response) => {
          success: true,
          message: "Service completed successfully",
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
          message: "Failed to complete service",
@@ -126,7 +126,7 @@ export const getQueueStats = async (_req: Request, res: Response) => {
          success: true,
          stats,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
          message: "Failed to get queue statistics",
@@ -134,6 +134,7 @@ export const getQueueStats = async (_req: Request, res: Response) => {
    }
 };
 
+// Module actions
 export const getModules = async (_req: Request, res: Response) => {
    try {
       const modules = await queueService.getAllModules();
@@ -142,7 +143,7 @@ export const getModules = async (_req: Request, res: Response) => {
          success: true,
          modules,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
          message: "Failed to get modules",
@@ -150,18 +151,19 @@ export const getModules = async (_req: Request, res: Response) => {
    }
 };
 
-export const initializeSystem = async (_req: Request, res: Response) => {
+export const createModule = async (req: Request, res: Response) => {
    try {
-      await queueService.initializeModules();
+      const { name, description } = req.body;
+      const module = await queueService.createModule(name, description);
 
       res.status(200).json({
          success: true,
-         message: "System initialized successfully",
+         module,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to initialize system",
+         message: "Failed to get modules",
       });
    }
 };
