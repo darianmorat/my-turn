@@ -4,6 +4,7 @@ import { useLayoutEffect, type ReactNode } from "react";
 import { QueueDisplayBoard } from "./pages/QueueDisplayBoard";
 import { ModuleDashboard } from "./pages/ModuleDashboard";
 import { ReceptionInterface } from "./pages/ReceptionInterface";
+import { Default } from "./layouts/Default";
 
 function App() {
    const Wrapper = ({ children }: { children: ReactNode }) => {
@@ -19,10 +20,12 @@ function App() {
    return (
       <Wrapper>
          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/1" element={<QueueDisplayBoard />} />
-            <Route path="/2" element={<ModuleDashboard />} />
-            <Route path="/3" element={<ReceptionInterface />} />
+            <Route element={<Default />}>
+               <Route path="/" element={<HomePage />} />
+               <Route path="/queue" element={<QueueDisplayBoard />} />
+               <Route path="/modules" element={<ModuleDashboard />} />
+               <Route path="/turns" element={<ReceptionInterface />} />
+            </Route>
          </Routes>
       </Wrapper>
    );

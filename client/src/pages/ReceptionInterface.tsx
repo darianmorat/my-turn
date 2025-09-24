@@ -5,6 +5,7 @@ import { X, UserPlus, Ticket, Search, Users } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 
 const userFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -78,68 +79,64 @@ export const ReceptionInterface = () => {
    );
 
    return (
-      <div className="min-h-screen bg-gray-100 p-6">
+      <div className="min-h-screen bg-background p-6">
          {/* Header */}
-         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+         <div className="bg-card rounded-md shadow p-6 mb-6 border">
             <div className="flex items-center justify-between mb-4">
-               <h1 className="text-2xl font-bold text-gray-800">Interfaz de Recepción</h1>
+               <h1 className="text-2xl font-bold text-card-foreground">
+                  Interfaz de Recepción
+               </h1>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               <div className="bg-blue-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-primary">
                      {stats?.waiting || 0}
                   </div>
-                  <div className="text-sm text-blue-800">En espera</div>
+                  <div className="text-sm text-muted-foreground">En espera</div>
                </div>
-               <div className="bg-green-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-green-600">
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-success">
                      {stats?.beingServed || 0}
                   </div>
-                  <div className="text-sm text-green-800">Atendiéndose</div>
+                  <div className="text-sm text-muted-foreground">Atendiéndose</div>
                </div>
-               <div className="bg-purple-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-purple-600">
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-purple-500">
                      {stats?.completed || 0}
                   </div>
-                  <div className="text-sm text-purple-800">Completados</div>
+                  <div className="text-sm text-muted-foreground">Completados</div>
                </div>
-               <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-600">
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-foreground">
                      {stats?.totalToday || 0}
                   </div>
-                  <div className="text-sm text-gray-800">Total Hoy</div>
+                  <div className="text-sm text-muted-foreground">Total Hoy</div>
                </div>
             </div>
          </div>
 
          {/* Action Buttons */}
          <div className="flex flex-wrap gap-4 mb-6">
-            <button
-               onClick={() => setActiveModal("user")}
-               className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
-            >
+            <Button onClick={() => setActiveModal("user")}>
                <UserPlus size={20} />
                Crear Usuario
-            </button>
+            </Button>
 
-            <button
-               onClick={() => setActiveModal("turn")}
-               className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
-            >
+            <Button onClick={() => setActiveModal("turn")} variant={"outline"}>
                <Ticket size={20} />
                Asignar Turno
-            </button>
+            </Button>
          </div>
 
          {/* Main Content */}
          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Registered Users */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-md">
-               <div className="p-4 border-b">
+            <div className="lg:col-span-2 bg-card rounded-md shadow border">
+               <div className="p-4 border-b border-border">
                   <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-lg font-semibold flex items-center gap-2">
+                     <h2 className="text-lg font-semibold flex items-center gap-2 text-card-foreground">
                         <Users size={20} />
                         Usuarios Registrados ({users.length})
                      </h2>
@@ -148,47 +145,49 @@ export const ReceptionInterface = () => {
                   <div className="relative">
                      <Search
                         size={20}
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                      />
                      <input
                         type="text"
                         placeholder="Buscar por nombre o cédula..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
                      />
                   </div>
                </div>
 
                <div className="max-h-96 overflow-y-auto">
                   {filteredUsers.length === 0 ? (
-                     <div className="p-8 text-center text-gray-500">
+                     <div className="p-8 text-center text-muted-foreground">
                         {searchTerm
                            ? "No se encontraron usuarios que coincidan con la búsqueda"
                            : "Aún no hay usuarios registrados"}
                      </div>
                   ) : (
-                     <div className="divide-y">
+                     <div className="divide-y divide-border">
                         {filteredUsers.map((user) => (
                            <div
                               key={user.id}
-                              className="p-4 hover:bg-gray-50 flex items-center justify-between"
+                              className="p-4 hover:bg-muted flex items-center justify-between"
                            >
                               <div>
-                                 <div className="font-medium">{user.name}</div>
-                                 <div className="text-sm text-gray-500">
+                                 <div className="font-medium text-foreground">
+                                    {user.name}
+                                 </div>
+                                 <div className="text-sm text-muted-foreground">
                                     Cédula: {user.nationalId}
                                  </div>
                               </div>
-                              <button
+                              <Button
                                  onClick={() => {
                                     turnForm.setValue("nationalId", user.nationalId);
                                     setActiveModal("turn");
                                  }}
-                                 className="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                 variant={"outline"}
                               >
                                  Asignar Turno
-                              </button>
+                              </Button>
                            </div>
                         ))}
                      </div>
@@ -197,37 +196,39 @@ export const ReceptionInterface = () => {
             </div>
 
             {/* Current Queue */}
-            <div className="bg-white rounded-lg shadow-md">
-               <div className="p-4 border-b">
-                  <h2 className="text-lg font-semibold">Cola Actual</h2>
+            <div className="bg-card rounded-md shadow border">
+               <div className="p-4 border-b border-border">
+                  <h2 className="text-lg font-semibold text-card-foreground">
+                     Cola Actual
+                  </h2>
                </div>
 
                <div className="max-h-96 overflow-y-auto">
                   {waitingTurns.length === 0 ? (
-                     <div className="p-8 text-center text-gray-500">
+                     <div className="p-8 text-center text-muted-foreground">
                         No hay personas en la cola
                      </div>
                   ) : (
-                     <div className="divide-y">
+                     <div className="divide-y divide-border">
                         {waitingTurns.slice(0, 10).map((turn, index) => (
                            <div
                               key={turn.id}
-                              className={`p-3 ${index === 0 ? "bg-yellow-50" : ""}`}
+                              className={`p-3 ${index === 0 ? "bg-accent/50" : ""}`}
                            >
                               <div className="flex items-center justify-between">
                                  <div>
-                                    <div className="font-bold text-blue-600">
+                                    <div className="font-bold text-primary">
                                        {turn.ticketCode}
                                     </div>
-                                    <div className="text-sm font-medium">
+                                    <div className="text-sm font-medium text-foreground">
                                        {turn.user.name}
                                     </div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-muted-foreground">
                                        #{turn.queueNumber}
                                     </div>
                                  </div>
                                  {index === 0 && (
-                                    <div className="bg-yellow-500 text-white px-2 py-1 rounded text-xs font-bold">
+                                    <div className="bg-warning text-warning-foreground px-2 py-1 rounded text-xs font-bold">
                                        SIGUIENTE
                                     </div>
                                  )}
@@ -236,7 +237,7 @@ export const ReceptionInterface = () => {
                         ))}
 
                         {waitingTurns.length > 10 && (
-                           <div className="p-3 text-center text-gray-500 text-sm">
+                           <div className="p-3 text-center text-muted-foreground text-sm">
                               +{waitingTurns.length - 10} más en espera...
                            </div>
                         )}
@@ -249,7 +250,7 @@ export const ReceptionInterface = () => {
          {/* Create User Modal */}
          {activeModal === "user" && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-               <div className="relative bg-white p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
+               <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
                      <h2 className="text-lg font-bold">Crear Usuario</h2>
                      <X
@@ -270,7 +271,7 @@ export const ReceptionInterface = () => {
                         <label className="block text-sm font-medium mb-1">Nombre</label>
                         <input
                            {...userForm.register("name")}
-                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            placeholder="Ingrese nombre completo"
                         />
                         {userForm.formState.errors.name && (
@@ -284,7 +285,7 @@ export const ReceptionInterface = () => {
                         <label className="block text-sm font-medium mb-1">Cédula</label>
                         <input
                            {...userForm.register("nationalId")}
-                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            placeholder="Ingrese número de cédula"
                         />
                         {userForm.formState.errors.nationalId && (
@@ -294,14 +295,10 @@ export const ReceptionInterface = () => {
                         )}
                      </div>
 
-                     <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                     >
+                     <Button type="submit" disabled={isLoading} className="w-full">
                         <UserPlus size={18} />
                         {isLoading ? "Creando..." : "Crear Usuario"}
-                     </button>
+                     </Button>
                   </form>
                </div>
             </div>
@@ -310,7 +307,7 @@ export const ReceptionInterface = () => {
          {/* Assign Turn Modal */}
          {activeModal === "turn" && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-               <div className="relative bg-white p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
+               <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
                      <h2 className="text-lg font-bold">Asignar Turno</h2>
                      <X
@@ -331,7 +328,7 @@ export const ReceptionInterface = () => {
                         <label className="block text-sm font-medium mb-1">Cédula</label>
                         <input
                            {...turnForm.register("nationalId")}
-                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
                            placeholder="Ingrese la cédula del cliente"
                         />
                         {turnForm.formState.errors.nationalId && (
@@ -341,7 +338,7 @@ export const ReceptionInterface = () => {
                         )}
                      </div>
 
-                     <div className="bg-yellow-50 p-3 rounded-lg">
+                     <div className="bg-yellow-50 p-3 rounded-md">
                         <div className="text-sm text-yellow-800">
                            <strong>Próximo ticket:</strong>{" "}
                            {stats?.nextTicket ||
@@ -352,14 +349,10 @@ export const ReceptionInterface = () => {
                         </div>
                      </div>
 
-                     <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                     >
+                     <Button type="submit" disabled={isLoading} className="w-full">
                         <Ticket size={18} />
                         {isLoading ? "Creando Turno..." : "Asignar Turno"}
-                     </button>
+                     </Button>
                   </form>
 
                   <div className="mt-4 pt-4 border-t text-center">
