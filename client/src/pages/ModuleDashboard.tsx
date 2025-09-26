@@ -127,7 +127,7 @@ export const ModuleDashboard = () => {
                </Button>
 
                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
                   <span>Auto-refrescado cada 5 segundos</span>
                </div>
             </div>
@@ -140,11 +140,10 @@ export const ModuleDashboard = () => {
                   <Users className="text-yellow-600 dark:text-yellow-400" size={24} />
                   <div>
                      <div className="font-semibold text-yellow-800 dark:text-yellow-300">
-                        Siguiente en la cola: {getNextInQueue()!.ticketCode}
+                        Siguiente en la cola: 
                      </div>
                      <div className="text-sm text-yellow-600 dark:text-yellow-400">
-                        {getNextInQueue()!.user.name} - Posición #
-                        {getNextInQueue()!.queueNumber}
+                        {getNextInQueue()!.user.name} - {getNextInQueue()!.ticketCode}
                      </div>
                   </div>
                </div>

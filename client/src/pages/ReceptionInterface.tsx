@@ -49,7 +49,7 @@ export const ReceptionInterface = () => {
       const interval = setInterval(() => {
          getStats();
          getWaitingTurns();
-      }, 10000); // 10s
+      }, 5000); // 5s
 
       return () => clearInterval(interval);
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,10 +66,7 @@ export const ReceptionInterface = () => {
       if (turn) {
          turnForm.reset();
          setActiveModal(null);
-
-         alert(
-            `¡Turno creado exitosamente!\n\nTicket: ${turn.ticketCode}\nCliente: ${turn.user.name}\nPosición: #${turn.queueNumber}`,
-         );
+         alert("Turno creado exitosamente"); // we should show the store msg, not this one
       }
    };
 
@@ -175,6 +172,10 @@ export const ReceptionInterface = () => {
                      </div>
                   ) : (
                      <div className="divide-y divide-border">
+                        {/* PENDING: */}
+                        {/* Here is needed pagination if the app escalates, since it would */}
+                        {/* show every single person listed, we should use pagination */}
+
                         {filteredUsers.map((user) => (
                            <div
                               key={user.id}
@@ -231,9 +232,6 @@ export const ReceptionInterface = () => {
                                     </div>
                                     <div className="text-sm font-medium text-foreground">
                                        {turn.user.name}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                       #{turn.queueNumber}
                                     </div>
                                  </div>
                                  {index === 0 && (
@@ -345,17 +343,6 @@ export const ReceptionInterface = () => {
                               {turnForm.formState.errors.nationalId.message}
                            </p>
                         )}
-                     </div>
-
-                     <div className="bg-yellow-50 p-3 rounded-md dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700">
-                        <div className="text-sm text-yellow-800 dark:text-yellow-500">
-                           <strong>Próximo ticket:</strong>{" "}
-                           {stats?.nextTicket ||
-                              `A${(stats?.totalToday || 0) + 1}`.padStart(4, "0")}
-                        </div>
-                        <div className="text-xs text-yellow-700 dark:text-yellow-500 mt-1">
-                           Actualmente {stats?.waiting || 0} personas en espera en la cola
-                        </div>
                      </div>
 
                      <Button type="submit" disabled={isLoading} className="w-full">

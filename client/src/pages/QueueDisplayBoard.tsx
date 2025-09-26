@@ -166,9 +166,6 @@ export const QueueDisplayBoard = () => {
                            <div className="text-base text-card-foreground mb-2">
                               {turn.user.name}
                            </div>
-                           <div className="text-sm text-muted-foreground mb-3">
-                              Posición: #{turn.queueNumber}
-                           </div>
 
                            {turn.predictedModule ? (
                               <div className="flex items-center justify-center gap-2 bg-muted rounded-md p-2 text-sm text-muted-foreground">

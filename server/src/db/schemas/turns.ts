@@ -3,7 +3,6 @@ import {
    uuid,
    varchar,
    pgTable,
-   integer,
    timestamp,
    date,
 } from "drizzle-orm/pg-core";
@@ -24,7 +23,6 @@ export const turns = pgTable("turns", {
       .default(sql`gen_random_uuid()`),
    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
    moduleId: uuid("module_id").references(() => modules.id, { onDelete: "cascade" }),
-   queueNumber: integer("queue_number").notNull(), // Global queue position (1, 2, 3, 4, 5...)
    ticketCode: varchar("ticket_code", { length: 10 }).notNull().unique(), // A001, A002, etc.
    status: turnStatusEnum("status").default("waiting"),
 

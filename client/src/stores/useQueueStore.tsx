@@ -23,7 +23,6 @@ export type Turn = {
    id: string;
    userId: string;
    moduleId?: string;
-   queueNumber: number;
    ticketCode: string;
    status: TurnStatus;
 

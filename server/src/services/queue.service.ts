@@ -21,6 +21,7 @@ export const queueService = {
       try {
          const today = new Date().toISOString().split("T")[0];
 
+         // Get/create daily counter for ticket codes
          let counter = await db
             .select()
             .from(queue)
@@ -38,21 +39,21 @@ export const queueService = {
             counter = [newCounter];
          }
 
-         const currentNumber = counter[0]?.currentNumber ?? 0;
-         const newQueueNumber = currentNumber + 1;
+         // Increment ticket counter
+         const currentTicketNumber = counter[0]?.currentNumber ?? 0;
+         const newTicketNumber = currentTicketNumber + 1;
 
          await db
             .update(queue)
-            .set({ currentNumber: newQueueNumber })
+            .set({ currentNumber: newTicketNumber })
             .where(eq(queue.serviceDate, today));
 
-         const ticketCode = `A${newQueueNumber.toString().padStart(3, "0")}`;
+         const ticketCode = `A${newTicketNumber.toString().padStart(3, "0")}`;
 
          const [newTurn] = await db
             .insert(turns)
             .values({
                userId,
-               queueNumber: newQueueNumber,
                ticketCode,
                status: "waiting",
                serviceDate: today,
@@ -82,7 +83,7 @@ export const queueService = {
          .from(turns)
          .leftJoin(users, eq(turns.userId, users.id))
          .where(eq(turns.status, "waiting"))
-         .orderBy(asc(turns.queueNumber))
+         .orderBy(asc(turns.createdAt))
          .limit(1);
 
       if (nextTurn.length === 0) return null;
@@ -146,7 +147,7 @@ export const queueService = {
          .from(turns)
          .leftJoin(users, eq(turns.userId, users.id))
          .where(eq(turns.status, "waiting"))
-         .orderBy(asc(turns.queueNumber));
+         .orderBy(asc(turns.createdAt));
 
       return waitingTurns.map((turn) => ({
          ...turn.turns,
