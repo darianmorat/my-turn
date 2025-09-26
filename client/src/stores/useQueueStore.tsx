@@ -73,19 +73,14 @@ type QueueStore = {
 };
 
 export const useQueueStore = create<QueueStore>((set, get) => ({
-   // Initial state
    waitingTurns: [],
    currentlyServed: [],
    modules: [],
    stats: null,
    isLoading: false,
 
+   // Reception actions
    createTurn: async (nationalId: string) => {
-      // if (!nationalId.trim()) {
-      //    toast.error("Please enter a National ID");
-      //    return null;
-      // }
-
       set({ isLoading: true });
       try {
          const body = { nationalId: nationalId };
@@ -119,21 +114,20 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   // Get currently served turns
-   getCurrentlyServed: async () => {
+   getStats: async () => {
       try {
-         const res = await api.get("/queue/currently-served");
+         const res = await api.get("/queue/stats");
 
          if (res.data.success) {
-            set({ currentlyServed: res.data.turns });
+            set({ stats: res.data.stats });
          }
       } catch (error) {
-         console.error("Failed to fetch currently served turns:", error);
+         console.error("Failed to fetch queue stats:", error);
       }
    },
 
-   // Call next person to module (for agents)
-   callNext: async (moduleId: number) => {
+   // Agent actions
+   callNext: async (moduleId: string) => {
       try {
          set({ isLoading: true });
          const res = await api.post("/queue/call-next", { moduleId });
@@ -165,8 +159,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   // Complete service (for agents)
-   completeTurn: async (turnId: number) => {
+   completeTurn: async (turnId: string) => {
       try {
          set({ isLoading: true });
          const res = await api.post(`/queue/complete/${turnId}`);
@@ -185,20 +178,19 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   // Get queue statistics
-   getStats: async () => {
+   getCurrentlyServed: async () => {
       try {
-         const res = await api.get("/queue/stats");
+         const res = await api.get("/queue/currently-served");
 
          if (res.data.success) {
-            set({ stats: res.data.stats });
+            set({ currentlyServed: res.data.turns });
          }
       } catch (error) {
-         console.error("Failed to fetch queue stats:", error);
+         console.error("Failed to fetch currently served turns:", error);
       }
    },
 
-   // Module actions
+   // System actions
    getModules: async () => {
       try {
          const res = await api.get("/queue/modules");
