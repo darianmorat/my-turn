@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Clock, Users, ArrowRight } from "lucide-react";
 import { useQueueStore } from "@/stores/useQueueStore";
 import { Container } from "@/components/Container";
+import { SoundUnlocker } from "@/components/SoundUnlocker";
 
 export const QueueDisplayBoard = () => {
    const {
@@ -62,8 +63,45 @@ export const QueueDisplayBoard = () => {
       hour12: true,
    });
 
+   // Sound for when next user can be called (module becomes available)
+   const previousAvailableModulesRef = useRef(0);
+   const previousWaitingCountRef = useRef(0);
+
+   useEffect(() => {
+      const availableModules = modules.filter((m) => m.isActive);
+      const busyModuleIds = currentlyServed.map((t) => t.moduleId).filter(Boolean);
+      const availableModuleCount = availableModules.filter(
+         (m) => !busyModuleIds.includes(m.id),
+      ).length;
+
+      const currentWaitingCount = waitingTurns.length;
+      const previousAvailableCount = previousAvailableModulesRef.current;
+      const previousWaitingCount = previousWaitingCountRef.current;
+
+      // Play sound when:
+      // 1. A module becomes available (available count increases)
+      // 2. There are people waiting
+      // 3. This isn't the initial load
+      const modulesBecameAvailable = availableModuleCount > previousAvailableCount;
+      const hasPeopleWaiting = currentWaitingCount > 0;
+      const isNotInitialLoad = previousAvailableCount > 0 || previousWaitingCount > 0;
+
+      if (modulesBecameAvailable && hasPeopleWaiting && isNotInitialLoad) {
+         const audio = new Audio("/bell.mp3");
+         audio.volume = 1.0;
+         audio.play().catch((e) => {
+            console.log("Sound failed:", e);
+         });
+      }
+
+      previousAvailableModulesRef.current = availableModuleCount;
+      previousWaitingCountRef.current = currentWaitingCount;
+   }, [modules, currentlyServed, waitingTurns]);
+
    return (
       <Container className="space-y-6">
+         <SoundUnlocker />
+
          {/* Header */}
          <div>
             <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">

@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueueStore } from "@/stores/useQueueStore";
-import { X, UserPlus, Ticket, Search, Users, Clock } from "lucide-react";
+import {
+   X,
+   UserPlus,
+   Ticket,
+   Search,
+   Users,
+   Clock,
+   EthernetPort,
+   ExternalLink,
+} from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -124,15 +133,20 @@ export const ReceptionInterface = () => {
          </div>
 
          {/* Action Buttons */}
-         <div className="flex flex-wrap gap-4">
-            <Button onClick={() => setActiveModal("user")}>
-               <UserPlus size={20} />
-               Crear Usuario
-            </Button>
-
-            <Button onClick={() => setActiveModal("turn")} variant={"outline"}>
-               <Ticket size={20} />
-               Asignar Turno
+         <div className="flex flex-wrap gap-4 justify-between">
+            <div className="flex flex-wrap gap-4">
+               <Button onClick={() => setActiveModal("user")}>
+                  <UserPlus size={20} />
+                  Crear Usuario
+               </Button>
+               <Button onClick={() => setActiveModal("turn")} variant={"outline"}>
+                  <Ticket size={20} />
+                  Asignar Turno
+               </Button>
+            </div>
+            <Button variant={"outline"} onClick={() => console.log("excel export")}>
+               <ExternalLink size={20} />
+               Exportar record
             </Button>
          </div>
 
