@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueueStore } from "@/stores/useQueueStore";
-import { X, UserPlus, Ticket, Search, Users } from "lucide-react";
+import { X, UserPlus, Ticket, Search, Users, Clock } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/Container";
 
 const userFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -78,38 +79,46 @@ export const ReceptionInterface = () => {
          user.nationalId.includes(searchTerm),
    );
 
-   return (
-      <div className="min-h-screen bg-background p-6">
-         {/* Header */}
-         <div className="bg-card rounded-md shadow p-6 mb-6 border">
-            <div className="flex items-center justify-between mb-4">
-               <h1 className="text-2xl font-bold text-card-foreground">
-                  Interfaz de Recepción
-               </h1>
-            </div>
+   const currentTime = new Date().toLocaleTimeString("es-CO", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+   });
 
-            {/* Quick Stats */}
+   return (
+      <Container className="space-y-6">
+         {/* Header */}
+         <div>
+            <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
+               Interfaz de Recepción
+            </h1>
+            <div className="flex items-center justify-center gap-12 text-muted-foreground">
+               <div className="flex items-center gap-2">
+                  <Clock size={20} />
+                  <span>{currentTime}</span>
+               </div>
+            </div>
+         </div>
+
+         {/* Quick Stats */}
+         <div className="bg-card rounded-md shadow p-6 border">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
-                  <div className="text-2xl font-bold text-primary">
-                     {stats?.waiting || 0}
-                  </div>
+                  <div className="text-2xl font-bold">{stats?.waiting || 0}</div>
                   <div className="text-sm text-muted-foreground">En espera</div>
                </div>
                <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
-                  <div className="text-2xl font-bold text-success">
-                     {stats?.beingServed || 0}
-                  </div>
+                  <div className="text-2xl font-bold">{stats?.beingServed || 0}</div>
                   <div className="text-sm text-muted-foreground">Atendiéndose</div>
                </div>
                <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
-                  <div className="text-2xl font-bold text-purple-500">
+                  <div className="text-2xl font-bold text-primary">
                      {stats?.completed || 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Completados</div>
                </div>
                <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
-                  <div className="text-2xl font-bold text-foreground">
+                  <div className="text-2xl font-bold text-primary">
                      {stats?.totalToday || 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Hoy</div>
@@ -118,7 +127,7 @@ export const ReceptionInterface = () => {
          </div>
 
          {/* Action Buttons */}
-         <div className="flex flex-wrap gap-4 mb-6">
+         <div className="flex flex-wrap gap-4">
             <Button onClick={() => setActiveModal("user")}>
                <UserPlus size={20} />
                Crear Usuario
@@ -338,13 +347,13 @@ export const ReceptionInterface = () => {
                         )}
                      </div>
 
-                     <div className="bg-yellow-50 p-3 rounded-md">
-                        <div className="text-sm text-yellow-800">
+                     <div className="bg-yellow-50 p-3 rounded-md dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700">
+                        <div className="text-sm text-yellow-800 dark:text-yellow-500">
                            <strong>Próximo ticket:</strong>{" "}
                            {stats?.nextTicket ||
                               `A${(stats?.totalToday || 0) + 1}`.padStart(4, "0")}
                         </div>
-                        <div className="text-xs text-yellow-600 mt-1">
+                        <div className="text-xs text-yellow-700 dark:text-yellow-500 mt-1">
                            Actualmente {stats?.waiting || 0} personas en espera en la cola
                         </div>
                      </div>
@@ -355,17 +364,18 @@ export const ReceptionInterface = () => {
                      </Button>
                   </form>
 
-                  <div className="mt-4 pt-4 border-t text-center">
+                  <div className="mt-4 pt-4 border-t text-center text-sm">
+                     ¿No esta registrado?{" "}
                      <button
                         onClick={() => setActiveModal("user")}
-                        className="text-blue-500 hover:text-blue-700 text-sm font-medium"
+                        className="text-blue-500 hover:text-blue-700 font-medium hover:underline"
                      >
-                        ¿Cliente no registrado? Cree un nuevo usuario primero
+                        Crear usuario
                      </button>
                   </div>
                </div>
             </div>
          )}
-      </div>
+      </Container>
    );
 };
