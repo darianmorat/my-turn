@@ -5,6 +5,7 @@ import { QueueDisplayBoard } from "./pages/QueueDisplayBoard";
 import { ModuleDashboard } from "./pages/ModuleDashboard";
 import { ReceptionInterface } from "./pages/ReceptionInterface";
 import { Default } from "./layouts/Default";
+import { Authentication } from "./pages/Authentication";
 
 function App() {
    const Wrapper = ({ children }: { children: ReactNode }) => {
@@ -22,6 +23,7 @@ function App() {
          <Routes>
             <Route element={<Default />}>
                <Route path="/" element={<HomePage />} />
+               <Route path="/login" element={<Authentication />} />
                <Route path="/queue" element={<QueueDisplayBoard />} />
                <Route path="/modules" element={<ModuleDashboard />} />
                <Route path="/turns" element={<ReceptionInterface />} />
