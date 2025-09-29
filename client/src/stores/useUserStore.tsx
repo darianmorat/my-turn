@@ -1,25 +1,15 @@
 import api from "@/api/axios";
+import type { User } from "@/types/user";
 import { toast } from "react-toastify";
 import { create } from "zustand";
 
-type User = {
-   nationalId: string;
-   name: string;
-};
-
-type Users = {
-   id: string;
-   nationalId: string;
-   name: string;
-};
-
-type Store = {
-   users: Users[];
+type UserStore = {
+   users: User[];
    getUsers: () => Promise<void>;
-   createUser: (values: User) => Promise<void>;
+   createUser: (nationalId: string, name: string) => Promise<void>;
 };
 
-export const useUserStore = create<Store>((set, get) => ({
+export const useUserStore = create<UserStore>((set, get) => ({
    users: [],
 
    getUsers: async () => {
@@ -34,13 +24,9 @@ export const useUserStore = create<Store>((set, get) => ({
       }
    },
 
-   createUser: async (values) => {
+   createUser: async (nationalId, name) => {
       try {
-         const body = {
-            nationalId: values.nationalId,
-            name: values.name,
-         };
-
+         const body = { nationalId, name };
          const res = await api.post("/user/create", body);
 
          if (res.data.success) {

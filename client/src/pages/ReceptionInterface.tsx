@@ -8,7 +8,6 @@ import {
    Search,
    Users,
    Clock,
-   EthernetPort,
    ExternalLink,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,7 +64,7 @@ export const ReceptionInterface = () => {
    }, []);
 
    const onCreateUser = async (data: UserFormData) => {
-      await createUser(data);
+      await createUser(data.nationalId, data.name);
       userForm.reset();
       setActiveModal(null);
    };
