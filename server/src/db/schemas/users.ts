@@ -12,6 +12,5 @@ export const users = pgTable("users", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  turns: many(turns),
+   turns: many(turns),
 }));
-

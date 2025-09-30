@@ -8,13 +8,13 @@ import {
    Plus,
    X,
    RefreshCcw,
-   Clock,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
+import { TimerWatch } from "@/components/TimerWatch";
 
 const moduleFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -88,12 +88,6 @@ export const ModuleDashboard = () => {
       return waitingTurns[0] || null;
    };
 
-   const currentTime = new Date().toLocaleTimeString("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-   });
-
    return (
       <Container className="space-y-6">
          {/* Encabezado */}
@@ -102,10 +96,7 @@ export const ModuleDashboard = () => {
                Panel de Gestión de Módulos
             </h1>
             <div className="flex items-center justify-center gap-12 text-muted-foreground">
-               <div className="flex items-center gap-2">
-                  <Clock size={20} />
-                  <span>{currentTime}</span>
-               </div>
+               <TimerWatch />
                <div className="flex items-center gap-2">
                   <Users size={20} />
                   <span>{stats?.waiting || 0} en espera</span>
@@ -140,7 +131,7 @@ export const ModuleDashboard = () => {
                   <Users className="text-yellow-600 dark:text-yellow-400" size={24} />
                   <div>
                      <div className="font-semibold text-yellow-800 dark:text-yellow-300">
-                        Siguiente en la cola: 
+                        Siguiente en la cola:
                      </div>
                      <div className="text-sm text-yellow-600 dark:text-yellow-400">
                         {getNextInQueue()!.user.name} - {getNextInQueue()!.ticketCode}

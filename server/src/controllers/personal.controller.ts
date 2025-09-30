@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { userService } from "../services/user.service";
+import { personalService } from "../services/personal.service";
 
-export const getAll = async (_req: Request, res: Response) => {
+export const getUsers = async (_req: Request, res: Response) => {
    try {
-      const users = await userService.getAll();
+      const users = await personalService.findAll();
 
       res.status(200).json({
          success: true,
@@ -19,12 +19,23 @@ export const getAll = async (_req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
    try {
-      const { nationalId, name } = req.body;
-      const user = await userService.createUser(nationalId, name);
+      const { name, email, password, role } = req.body;
+      const existingUser = await personalService.exists(email);
+
+      if (existingUser) {
+         res.status(409).json({
+            success: false,
+            message: "Este correo ya está en uso",
+         });
+
+         return;
+      }
+
+      const user = await personalService.create(name, email, password, role);
 
       res.status(200).json({
          success: true,
-         message: "Usuario creado",
+         message: `Usuario "${user.name}" creado`,
          newUser: user,
       });
    } catch {
@@ -37,9 +48,9 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const editUser = async (req: Request, res: Response) => {
    try {
-      const { name, nationalId } = req.body;
+      const { name, email, password, role } = req.body;
       const { id } = req.params;
-      const user = await userService.edit(id, { name, nationalId });
+      const user = await personalService.edit(id, { name, email, password, role });
 
       res.status(200).json({
          success: true,
@@ -57,7 +68,7 @@ export const editUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
    try {
       const { id } = req.params;
-      const user = await userService.delete(id);
+      const user = await personalService.delete(id);
 
       res.status(200).json({
          success: true,

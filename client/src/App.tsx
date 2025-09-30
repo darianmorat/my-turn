@@ -1,11 +1,12 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import { HomePage } from "./pages/HomePage";
+import { Selection } from "./pages/Selection";
 import { useLayoutEffect, type ReactNode } from "react";
 import { QueueDisplayBoard } from "./pages/QueueDisplayBoard";
 import { ModuleDashboard } from "./pages/ModuleDashboard";
 import { ReceptionInterface } from "./pages/ReceptionInterface";
 import { Default } from "./layouts/Default";
 import { Authentication } from "./pages/Authentication";
+import { Dashboard } from "./pages/Dashboard";
 
 function App() {
    const Wrapper = ({ children }: { children: ReactNode }) => {
@@ -22,11 +23,25 @@ function App() {
       <Wrapper>
          <Routes>
             <Route element={<Default />}>
-               <Route path="/" element={<HomePage />} />
-               <Route path="/login" element={<Authentication />} />
+               {/* MANAGERS */}
+               {/* they should have access to every single page, and also able to */}
+               {/* manage the process as the other roles, but he creates the  */}
+               {/* agents, receptionists and other managers */}
+               <Route path="/" element={<Authentication />} />
+               <Route path="/selection" element={<Selection />} />
                <Route path="/queue" element={<QueueDisplayBoard />} />
+               <Route path="/dashboard" element={<Dashboard />} />
+               <Route path="/dashboard/:tab" element={<Dashboard />} />
+
+               {/* AGENTS */}
+               {/* A page per agent should be created and a way to assign the agent */}
+               {/* to that specific module also should be added */}
                <Route path="/modules" element={<ModuleDashboard />} />
-               <Route path="/turns" element={<ReceptionInterface />} />
+
+               {/* RECEPTIONIST */}
+               {/* They create the turns and users... no more interaction, and this */}
+               {/* is the only page they should have access to */}
+               <Route path="/reception" element={<ReceptionInterface />} />
             </Route>
          </Routes>
       </Wrapper>

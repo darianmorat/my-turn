@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Container } from "@/components/Container";
 
-export const HomePage = () => {
+export const Selection = () => {
    const navigate = useNavigate();
 
    return (
@@ -35,7 +35,18 @@ export const HomePage = () => {
                <p className="text-muted-foreground">
                   Crea turnos para usuarios registrados o registra usuarios en el sistema.
                </p>
-               <Button onClick={() => navigate("/turns")}>Ir a turnos</Button>
+               <Button onClick={() => navigate("/reception")}>Ir a turnos</Button>
+            </CardContent>
+         </Card>
+
+         <Card className="shadow rounded-md bg-card h-fit">
+            <CardContent className="flex flex-col gap-4">
+               <h2 className="font-medium">Manager Panel</h2>
+               <p className="text-muted-foreground">
+                  Gestion de agentes, recepcionistas y managers... Verificacion de
+                  informacion general
+               </p>
+               <Button onClick={() => navigate("/dashboard")}>Ir Dashboard</Button>
             </CardContent>
          </Card>
       </Container>

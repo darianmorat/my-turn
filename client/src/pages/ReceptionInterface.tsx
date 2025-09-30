@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueueStore } from "@/stores/useQueueStore";
-import {
-   X,
-   UserPlus,
-   Ticket,
-   Search,
-   Users,
-   Clock,
-   ExternalLink,
-} from "lucide-react";
+import { X, UserPlus, Ticket, Search, Users } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
+import { TimerWatch } from "@/components/TimerWatch";
 
 const userFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -84,12 +77,6 @@ export const ReceptionInterface = () => {
          user.nationalId.includes(searchTerm),
    );
 
-   const currentTime = new Date().toLocaleTimeString("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-   });
-
    return (
       <Container className="space-y-6">
          {/* Header */}
@@ -97,12 +84,7 @@ export const ReceptionInterface = () => {
             <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
                Interfaz de Recepción
             </h1>
-            <div className="flex items-center justify-center gap-12 text-muted-foreground">
-               <div className="flex items-center gap-2">
-                  <Clock size={20} />
-                  <span>{currentTime}</span>
-               </div>
-            </div>
+            <TimerWatch />
          </div>
 
          {/* Quick Stats */}
@@ -138,15 +120,15 @@ export const ReceptionInterface = () => {
                   <UserPlus size={20} />
                   Crear Usuario
                </Button>
-               <Button onClick={() => setActiveModal("turn")} variant={"outline"}>
-                  <Ticket size={20} />
-                  Asignar Turno
-               </Button>
+               {/* <Button onClick={() => setActiveModal("turn")} variant={"outline"}> */}
+               {/*    <Ticket size={20} /> */}
+               {/*    Asignar Turno */}
+               {/* </Button> */}
             </div>
-            <Button variant={"outline"} onClick={() => console.log("excel export")}>
-               <ExternalLink size={20} />
-               Exportar record
-            </Button>
+            {/* <Button variant={"outline"} onClick={() => console.log("excel export")}> */}
+            {/*    <ExternalLink size={20} /> */}
+            {/*    Exportar record */}
+            {/* </Button> */}
          </div>
 
          {/* Main Content */}

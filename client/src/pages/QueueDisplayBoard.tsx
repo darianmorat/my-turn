@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
-import { Clock, Users, ArrowRight } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 import { useQueueStore } from "@/stores/useQueueStore";
 import { Container } from "@/components/Container";
 import { SoundUnlocker } from "@/components/SoundUnlocker";
+import { TimerWatch } from "@/components/TimerWatch";
 
 export const QueueDisplayBoard = () => {
    const {
@@ -57,11 +58,6 @@ export const QueueDisplayBoard = () => {
    };
 
    const nextTurns = getNextTurnsWithModules();
-   const currentTime = new Date().toLocaleTimeString("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-   });
 
    // Sound for when next user can be called (module becomes available)
    const previousAvailableModulesRef = useRef(0);
@@ -108,10 +104,7 @@ export const QueueDisplayBoard = () => {
                Sistema de Gestión de Turnos
             </h1>
             <div className="flex items-center justify-center gap-12 text-muted-foreground">
-               <div className="flex items-center gap-2">
-                  <Clock size={20} />
-                  <span>{currentTime}</span>
-               </div>
+               <TimerWatch />
                <div className="flex items-center gap-2">
                   <Users size={20} />
                   <span>{stats?.waiting || 0} en espera</span>

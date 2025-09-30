@@ -1,29 +1,33 @@
-import api from "@/api/axios";
-import type { User } from "@/types/user";
-import { toast } from "react-toastify";
 import { create } from "zustand";
+import { toast } from "react-toastify";
+import api from "@/api/axios";
+import type { Personal } from "@/types/personal";
 
-type UserStore = {
+type PersonalStore = {
    isLoading: boolean;
-   users: User[];
+   users: Personal[];
    getUsers: () => Promise<void>;
-   createUser: (name: string, nationalId: string) => Promise<void>;
+   createUser: (
+      name: string,
+      email: string,
+      password: string,
+      role: string,
+   ) => Promise<void>;
    editUser: (
       id: string,
-      updates: { name?: string; nationalId?: string },
+      updates: { name?: string; email?: string; password?: string; role?: string },
    ) => Promise<void>;
    deleteUser: (id: string) => Promise<void>;
 };
 
-export const useUserStore = create<UserStore>((set, get) => ({
+export const usePersonalStore = create<PersonalStore>((set, get) => ({
    isLoading: false,
    users: [],
 
    getUsers: async () => {
       set({ isLoading: true });
       try {
-         const res = await api.get("/user/get-all");
-
+         const res = await api.get("/personal/get-all");
          if (res.data.success) {
             set({ users: res.data.users });
          }
@@ -34,15 +38,20 @@ export const useUserStore = create<UserStore>((set, get) => ({
       }
    },
 
-   createUser: async (name, nationalId) => {
+   createUser: async (name, email, password, role) => {
       set({ isLoading: true });
       try {
-         const body = { name, nationalId };
-         const res = await api.post("/user/create", body);
+         const body = {
+            name: name,
+            email: email,
+            password: password,
+            role: role,
+         };
+
+         const res = await api.post("/personal/create", body);
 
          if (res.data.success) {
             toast.success(res.data.message);
-
             const currentUsers = get().users;
             const newUser = res.data.newUser;
             set({ users: [...currentUsers, newUser] });
@@ -57,7 +66,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
    editUser: async (id, updates) => {
       set({ isLoading: true });
       try {
-         const res = await api.post(`/user/edit/${id}`, updates);
+         const res = await api.post(`/personal/edit/${id}`, updates);
 
          if (res.data.success) {
             toast.success(res.data.message);
@@ -77,7 +86,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
    deleteUser: async (id) => {
       set({ isLoading: true });
       try {
-         const res = await api.delete(`/user/delete/${id}`);
+         const res = await api.delete(`/personal/delete/${id}`);
 
          if (res.data.success) {
             toast.success(res.data.message);
