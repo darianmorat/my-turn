@@ -1,7 +1,8 @@
 import { LoginForm } from "@/components/login-form";
 import authImage from "../assets/authImage.jpg";
-// import sena_logo from "../assets/logo-sena.png";
 import { ModeToggle } from "@/components/ModeToggle";
+import sena_logo from "../assets/logo-sena.png";
+import ape_logo from "../assets/logo-ape.png";
 
 export const Authentication = () => {
    return (
@@ -71,19 +72,18 @@ export const Authentication = () => {
                }}
             />
             {/* Your Content/Components */}
-            <div className="relative flex flex-col gap-4 p-6 md:p-10 absolute w-full min-h-screen">
-               <div className="flex justify-center gap-2 md:justify-start">
-                  {/* <img src={sena_logo} className="w-40" alt="Sena Logo" /> */}
-                  {/* <img src={logo} className="h-8 size-10 dark:invert" alt="Ticsor Logo" /> */}
-                  {/* <span className="self-center font-semibold whitespace-nowrap dark:text-white"> */}
-                  {/*    Ticsor App */}
-                  {/* </span> */}
-               </div>
+            <div className="relative flex flex-col gap-4 absolute w-full min-h-screen">
                <div className="flex flex-1 items-center justify-center">
                   <div className="w-full max-w-xs">
                      <LoginForm />
                   </div>
                </div>
+               <img src={ape_logo} className="absolute w-35 m-6" alt="Sena Logo" />
+               <img
+                  src={sena_logo}
+                  className="w-40 absolute right-0 bottom-0 m-6"
+                  alt="Ape Logo"
+               />
             </div>
          </div>
          {/* CUSTOM BACKGROUND */}

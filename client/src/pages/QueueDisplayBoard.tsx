@@ -4,6 +4,8 @@ import { useQueueStore } from "@/stores/useQueueStore";
 import { Container } from "@/components/Container";
 import { SoundUnlocker } from "@/components/SoundUnlocker";
 import { TimerWatch } from "@/components/TimerWatch";
+import sena_logo from "../assets/logo-sena.png";
+import ape_logo from "../assets/logo-ape.png";
 
 export const QueueDisplayBoard = () => {
    const {
@@ -95,8 +97,26 @@ export const QueueDisplayBoard = () => {
    }, [modules, currentlyServed, waitingTurns]);
 
    return (
-      <Container className="space-y-6">
+      <Container className="space-y-6 relative">
          <SoundUnlocker />
+
+         <div className="hidden sm:block m-0">
+            <img src={ape_logo} className="absolute w-35 my-2" alt="Ape Logo" />
+            <img
+               src={sena_logo}
+               className="w-45 absolute right-0 mx-5 my-2"
+               alt="Sena Logo"
+            />
+         </div>
+
+         <div className="block sm:hidden flex justify-between">
+            <img src={ape_logo} className="relative w-25 mx-2 my-2" alt="Ape Logo" />
+            <img
+               src={sena_logo}
+               className="w-35 h-8 relative right-0 mx-2 my-2"
+               alt="Sena Logo"
+            />
+         </div>
 
          {/* Header */}
          <div>
