@@ -49,7 +49,7 @@ export const Dashboard = () => {
                </h1>
                <TimerWatch />
             </div>
-            <div className="my-6 bg-gray-100 rounded-md p-1 inline-flex gap-1 shadow border">
+            <div className="my-6 bg-gray-100 dark:bg-gray-400/20 rounded-md p-1 inline-flex gap-1 shadow border">
                {sections.map((section) => (
                   <Button
                      key={section.id}

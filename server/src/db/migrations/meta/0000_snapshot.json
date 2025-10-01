@@ -1,5 +1,5 @@
 {
-  "id": "93190987-f163-44cb-9b76-8d63be1c3e18",
+  "id": "5d4d57c8-c74b-4717-a8f6-a733f63d29b7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -119,6 +119,18 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_national_id": {
+          "name": "user_national_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
         },
         "module_id": {
           "name": "module_id",

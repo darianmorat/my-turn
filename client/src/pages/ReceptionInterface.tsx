@@ -57,7 +57,7 @@ export const ReceptionInterface = () => {
    }, []);
 
    const onCreateUser = async (data: UserFormData) => {
-      await createUser(data.nationalId, data.name);
+      await createUser(data.name, data.nationalId);
       userForm.reset();
       setActiveModal(null);
    };

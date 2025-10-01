@@ -19,8 +19,8 @@ export const getAll = async (_req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
    try {
-      const { nationalId, name } = req.body;
-      const user = await userService.createUser(nationalId, name);
+      const { name, nationalId } = req.body;
+      const user = await userService.createUser(name, nationalId);
 
       res.status(200).json({
          success: true,

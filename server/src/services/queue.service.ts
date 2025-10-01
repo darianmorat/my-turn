@@ -14,10 +14,14 @@ export const queueService = {
          throw new Error("User not found. Please register first.");
       }
 
-      return queueService.createTurnForUser(user.id);
+      return queueService.createTurnForUser(user.id, user.name, user.nationalId);
    },
 
-   createTurnForUser: async (userId: string) => {
+   createTurnForUser: async (
+      userId: string,
+      userName: string,
+      userNationalId: string,
+   ) => {
       try {
          const today = new Date().toISOString().split("T")[0];
 
@@ -54,6 +58,8 @@ export const queueService = {
             .insert(turns)
             .values({
                userId,
+               userName,
+               userNationalId,
                ticketCode,
                status: "waiting",
                serviceDate: today,

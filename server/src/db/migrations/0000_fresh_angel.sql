@@ -20,6 +20,8 @@ CREATE TABLE "modules" (
 CREATE TABLE "turns" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid,
+	"user_name" varchar NOT NULL,
+	"user_national_id" varchar NOT NULL,
 	"module_id" uuid,
 	"ticket_code" varchar(10) NOT NULL,
 	"status" "turn_status" DEFAULT 'waiting',

@@ -9,8 +9,8 @@ export const userService = {
       return result;
    },
 
-   createUser: async (nationalId: string, name: string) => {
-      const [result] = await db.insert(users).values({ nationalId, name }).returning();
+   createUser: async (name: string, nationalId: string) => {
+      const [result] = await db.insert(users).values({ name, nationalId }).returning();
 
       return result;
    },

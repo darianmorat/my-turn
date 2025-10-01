@@ -1,11 +1,4 @@
-import {
-   pgEnum,
-   uuid,
-   varchar,
-   pgTable,
-   timestamp,
-   date,
-} from "drizzle-orm/pg-core";
+import { pgEnum, uuid, varchar, pgTable, timestamp, date } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { users } from "./users";
 import { modules } from "./modules";
@@ -22,6 +15,10 @@ export const turns = pgTable("turns", {
       .primaryKey()
       .default(sql`gen_random_uuid()`),
    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+   userName: varchar("user_name").notNull(),
+   userNationalId: varchar("user_national_id").notNull(),
+
+   // Modules
    moduleId: uuid("module_id").references(() => modules.id, { onDelete: "cascade" }),
    ticketCode: varchar("ticket_code", { length: 10 }).notNull().unique(), // A001, A002, etc.
    status: turnStatusEnum("status").default("waiting"),
