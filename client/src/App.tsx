@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Selection } from "./pages/Selection";
 import { useLayoutEffect, type ReactNode } from "react";
 import { QueueDisplayBoard } from "./pages/QueueDisplayBoard";
@@ -7,6 +7,11 @@ import { ReceptionInterface } from "./pages/ReceptionInterface";
 import { Default } from "./layouts/Default";
 import { Authentication } from "./pages/Authentication";
 import { Dashboard } from "./pages/Dashboard";
+import { NotFound } from "./pages/NotFound";
+
+// PENDING
+// we are saving the date when the user takes the turn and finish it, but we should save
+// that time using colombia time, check that out, for a better filtering later on
 
 function App() {
    const Wrapper = ({ children }: { children: ReactNode }) => {
@@ -23,11 +28,15 @@ function App() {
       <Wrapper>
          <Routes>
             <Route element={<Default />}>
+               <Route path="/404" element={<NotFound />} />
+               <Route path="/*" element={<Navigate to={"/404"} />} />
+
                {/* MANAGERS */}
                {/* they should have access to every single page, and also able to */}
                {/* manage the process as the other roles, but he creates the  */}
                {/* agents, receptionists and other managers */}
                <Route path="/" element={<Authentication />} />
+
                <Route path="/selection" element={<Selection />} />
                <Route path="/queue" element={<QueueDisplayBoard />} />
                <Route path="/dashboard" element={<Dashboard />} />
