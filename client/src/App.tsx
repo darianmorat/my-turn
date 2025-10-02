@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Selection } from "./pages/Selection";
-import { useLayoutEffect, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, type ReactNode } from "react";
 import { QueueDisplayBoard } from "./pages/QueueDisplayBoard";
 import { ModuleDashboard } from "./pages/ModuleDashboard";
 import { ReceptionInterface } from "./pages/ReceptionInterface";
@@ -8,12 +8,26 @@ import { Default } from "./layouts/Default";
 import { Authentication } from "./pages/Authentication";
 import { Dashboard } from "./pages/Dashboard";
 import { NotFound } from "./pages/NotFound";
+import { useAuthStore } from "./stores/useAuthStore";
+import { LoadingSpinner } from "./components/LoadingSpinner";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Bounce, ToastContainer } from "react-toastify";
 
 // PENDING
 // we are saving the date when the user takes the turn and finish it, but we should save
 // that time using colombia time, check that out, for a better filtering later on
 
 function App() {
+   const { isAuth, checkingAuth, checkAuth } = useAuthStore();
+
+   useEffect(() => {
+      checkAuth();
+   }, [checkAuth]);
+
+   if (checkingAuth) {
+      return <LoadingSpinner />;
+   }
+
    const Wrapper = ({ children }: { children: ReactNode }) => {
       const location = useLocation();
 
@@ -25,35 +39,80 @@ function App() {
    };
 
    return (
-      <Wrapper>
-         <Routes>
-            <Route element={<Default />}>
-               <Route path="/404" element={<NotFound />} />
-               <Route path="/*" element={<Navigate to={"/404"} />} />
+      <>
+         <Wrapper>
+            <Routes>
+               <Route element={<Default />}>
+                  {/* PUBLIC */}
+                  <Route
+                     path="/"
+                     element={
+                        isAuth ? <Navigate to={"/selection"} /> : <Authentication />
+                     }
+                  />
+                  <Route path="/queue" element={<QueueDisplayBoard />} />
 
-               {/* MANAGERS */}
-               {/* they should have access to every single page, and also able to */}
-               {/* manage the process as the other roles, but he creates the  */}
-               {/* agents, receptionists and other managers */}
-               <Route path="/" element={<Authentication />} />
+                  {/* ERRORS */}
+                  <Route path="/404" element={<NotFound />} />
+                  <Route path="/*" element={<Navigate to={"/404"} />} />
 
-               <Route path="/selection" element={<Selection />} />
-               <Route path="/queue" element={<QueueDisplayBoard />} />
-               <Route path="/dashboard" element={<Dashboard />} />
-               <Route path="/dashboard/:tab" element={<Dashboard />} />
+                  {/* MANAGERS */}
+                  <Route
+                     path="/selection"
+                     element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                           <Selection />
+                        </ProtectedRoute>
+                     }
+                  />
+                  <Route
+                     path="/dashboard"
+                     element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                           <Dashboard />
+                        </ProtectedRoute>
+                     }
+                  />
+                  <Route
+                     path="/dashboard/:tab"
+                     element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                           <Dashboard />
+                        </ProtectedRoute>
+                     }
+                  />
 
-               {/* AGENTS */}
-               {/* A page per agent should be created and a way to assign the agent */}
-               {/* to that specific module also should be added */}
-               <Route path="/modules" element={<ModuleDashboard />} />
+                  {/* AGENTS */}
+                  <Route
+                     path="/modules"
+                     element={
+                        <ProtectedRoute allowedRoles={["agent"]}>
+                           <ModuleDashboard />
+                        </ProtectedRoute>
+                     }
+                  />
 
-               {/* RECEPTIONIST */}
-               {/* They create the turns and users... no more interaction, and this */}
-               {/* is the only page they should have access to */}
-               <Route path="/reception" element={<ReceptionInterface />} />
-            </Route>
-         </Routes>
-      </Wrapper>
+                  {/* RECEPTIONIST */}
+                  <Route
+                     path="/reception"
+                     element={
+                        <ProtectedRoute allowedRoles={["receptionist"]}>
+                           <ReceptionInterface />
+                        </ProtectedRoute>
+                     }
+                  />
+               </Route>
+            </Routes>
+         </Wrapper>
+         <ToastContainer
+            className="mb-[-15px]"
+            theme="colored"
+            autoClose={4500}
+            position="bottom-center"
+            transition={Bounce}
+            pauseOnHover={false}
+         />
+      </>
    );
 }
 

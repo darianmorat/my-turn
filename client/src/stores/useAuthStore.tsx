@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { toast } from "react-toastify";
 import api from "@/api/axios";
-import type { User } from "@/types/user";
+import type { Personal } from "@/types/personal";
 
 type AuthStore = {
    isAuth: boolean;
    isLoading: boolean;
    checkingAuth: boolean;
    isCountingDown: boolean;
-   user: User | null;
+   user: Personal | null;
    authenticate: (email: string, password: string) => Promise<void>;
    logout: () => Promise<void>;
    checkAuth: () => Promise<void>;
