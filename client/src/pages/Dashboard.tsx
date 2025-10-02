@@ -4,6 +4,7 @@ import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
 import { PersonalSection } from "@/components/dasboard/Personal/Personal";
 import { UserSection } from "@/components/dasboard/Users/User";
+import { ModuleSection } from "@/components/dasboard/Modules/Module";
 
 export const Dashboard = () => {
    const { tab } = useParams<{ tab?: string }>();
@@ -32,7 +33,7 @@ export const Dashboard = () => {
          case "personal":
             return <PersonalSection />;
          case "modulos":
-            return <PersonalSection />; // Replace with ModulesSection
+            return <ModuleSection />; 
          case "usuarios":
             return <UserSection />;
          default:

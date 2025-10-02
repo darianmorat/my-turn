@@ -58,8 +58,8 @@ export const PersonalSection = () => {
             <table className="min-w-full text-left">
                <thead className="bg-accent uppercase text-xs">
                   <tr>
-                     <th className="px-6 py-3 min-w-fit border-r text-left">Usuario</th>
-                     <th className="px-6 py-3 min-w-fit border-r text-center">Role</th>
+                     <th className="px-6 py-3 min-w-fit border-r text-left">Personal</th>
+                     <th className="px-6 py-3 min-w-fit border-r text-center">Rol</th>
                      <th className="px-6 py-3 min-w-fit border-r text-center">
                         Creación
                      </th>
@@ -70,7 +70,7 @@ export const PersonalSection = () => {
                   {users.length === 0 && (
                      <tr>
                         <td colSpan={4} className="text-center py-6">
-                           No hay usuarios para mostrar
+                           No hay personal para mostrar
                         </td>
                      </tr>
                   )}
@@ -129,11 +129,11 @@ export const PersonalSection = () => {
          {showModal.active && showModal.for === "create" && (
             <CreateUser handleModal={() => handleModal("")} />
          )}
-         {showModal.active && showModal.for === "delete" && selectedUser && (
-            <DeleteUser handleModal={() => handleModal("")} user={selectedUser} />
-         )}
          {showModal.active && showModal.for === "edit" && selectedUser && (
             <EditUser handleModal={() => handleModal("")} user={selectedUser} />
+         )}
+         {showModal.active && showModal.for === "delete" && selectedUser && (
+            <DeleteUser handleModal={() => handleModal("")} user={selectedUser} />
          )}
       </>
    );

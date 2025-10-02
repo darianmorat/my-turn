@@ -1,24 +1,23 @@
 import { PencilLine, Plus, Trash } from "lucide-react";
 import { Button } from "../../ui/button";
 import { useEffect, useState } from "react";
-import { CreateUser } from "./CreateUser";
-import { DeleteUser } from "./DeleteUser";
-import { formatDate } from "@/utils/format-date";
-import { EditUser } from "./EditUser";
-import type { User } from "@/types/user";
-import { useUserStore } from "@/stores/useUserStore";
+import type { Module } from "@/types/queue";
+import { useQueueStore } from "@/stores/useQueueStore";
+import { CreateModule } from "./CreateModule";
+import { DeleteModule } from "./DeleteModule";
+import { EditModule } from "./EditModule";
 
-export const UserSection = () => {
+export const ModuleSection = () => {
    const [showModal, setShowModal] = useState({ active: false, for: "" });
-   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-   const { users = [], getUsers } = useUserStore();
+   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
+   const { modules, getModules } = useQueueStore();
 
    const handleModal = (modal: string): void => {
       setShowModal((prev) => ({ active: !prev.active, for: modal }));
    };
 
    useEffect(() => {
-      getUsers();
+      getModules();
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
@@ -28,13 +27,13 @@ export const UserSection = () => {
             <div className="flex gap-8">
                <div>
                   <p className="text-3xl font-bold">
-                     {users.length.toString().padStart(2, "0")}
+                     {modules.length.toString().padStart(2, "0")}
                   </p>
-                  <p className="text-sm">Total Usuarios</p>
+                  <p className="text-sm">Total Modulos</p>
                </div>
             </div>
             <Button onClick={() => handleModal("create")}>
-               <Plus /> Crear usuario
+               <Plus /> Crear Modulo
             </Button>
          </div>
 
@@ -42,32 +41,29 @@ export const UserSection = () => {
             <table className="min-w-full text-left">
                <thead className="bg-accent uppercase text-xs">
                   <tr>
-                     <th className="px-6 py-3 min-w-fit border-r text-left">Usuario</th>
+                     <th className="px-6 py-3 min-w-fit border-r text-left">Nombre</th>
                      <th className="px-6 py-3 min-w-fit border-r text-center">
-                        Creación
+                        Descripción
                      </th>
                      <th className="px-6 py-3 min-w-sm text-right">Acciones</th>
                   </tr>
                </thead>
                <tbody className="divide-y">
-                  {users.length === 0 && (
+                  {modules.length === 0 && (
                      <tr>
                         <td colSpan={4} className="text-center py-6">
-                           No hay usuarios para mostrar
+                           No hay módulos para mostrar
                         </td>
                      </tr>
                   )}
-                  {users.map((user) => (
-                     <tr key={user.id}>
+                  {modules.map((module) => (
+                     <tr key={module.id}>
                         <td className="px-6 py-4 border-r">
-                           <div className="font-medium">{user.name}</div>
-                           <div className="text-sm text-gray-500 max-w-70 truncate">
-                              {user.nationalId}
-                           </div>
+                           <div className="font-medium">{module.name}</div>
                         </td>
                         <td className="px-6 py-4 border-r text-center">
                            <span className="inline-block text-sm whitespace-nowrap w-30">
-                              {formatDate(user.createdAt)}
+                              {module.description}
                            </span>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -76,7 +72,7 @@ export const UserSection = () => {
                                  variant="outline"
                                  onClick={() => {
                                     handleModal("edit");
-                                    setSelectedUser(user);
+                                    setSelectedModule(module);
                                  }}
                               >
                                  <PencilLine />
@@ -92,7 +88,7 @@ export const UserSection = () => {
                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                  onClick={() => {
                                     handleModal("delete");
-                                    setSelectedUser(user);
+                                    setSelectedModule(module);
                                  }}
                               >
                                  <Trash />
@@ -105,13 +101,13 @@ export const UserSection = () => {
             </table>
          </div>
          {showModal.active && showModal.for === "create" && (
-            <CreateUser handleModal={() => handleModal("")} />
+            <CreateModule handleModal={() => handleModal("")} />
          )}
-         {showModal.active && showModal.for === "edit" && selectedUser && (
-            <EditUser handleModal={() => handleModal("")} user={selectedUser} />
+         {showModal.active && showModal.for === "edit" && selectedModule && (
+            <EditModule handleModal={() => handleModal("")} module={selectedModule} />
          )}
-         {showModal.active && showModal.for === "delete" && selectedUser && (
-            <DeleteUser handleModal={() => handleModal("")} user={selectedUser} />
+         {showModal.active && showModal.for === "delete" && selectedModule && (
+            <DeleteModule handleModal={() => handleModal("")} module={selectedModule} />
          )}
       </>
    );

@@ -1,31 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQueueStore } from "@/stores/useQueueStore";
-import {
-   UserCheck,
-   CheckCircle,
-   Users,
-   Phone,
-   Plus,
-   X,
-   RefreshCcw,
-} from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { UserCheck, CheckCircle, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
 
-const moduleFormSchema = z.object({
-   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-   description: z.string().min(5, "La descripción debe tener al menos 5 caracteres"),
-});
-
-type ModuleFormData = z.infer<typeof moduleFormSchema>;
-
 export const ModuleDashboard = () => {
-   const [activeModal, setActiveModal] = useState<"module" | null>(null);
-
    const {
       modules,
       currentlyServed,
@@ -37,14 +17,8 @@ export const ModuleDashboard = () => {
       getModules,
       getWaitingTurns,
       getStats,
-      createModule,
       isLoading,
    } = useQueueStore();
-
-   const moduleForm = useForm<ModuleFormData>({
-      resolver: zodResolver(moduleFormSchema),
-      defaultValues: { name: "", description: "" },
-   });
 
    useEffect(() => {
       const fetchData = async () => {
@@ -57,7 +31,7 @@ export const ModuleDashboard = () => {
       };
 
       fetchData();
-      const interval = setInterval(fetchData, 5000);
+      const interval = setInterval(fetchData, 3000);
       return () => clearInterval(interval);
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
@@ -73,12 +47,6 @@ export const ModuleDashboard = () => {
       await completeTurn(turnId);
    };
 
-   const onCreateModule = async (data: ModuleFormData) => {
-      await createModule(data.name, data.description);
-      moduleForm.reset();
-      setActiveModal(null);
-   };
-
    const getModuleStatus = (moduleId: string) => {
       const serving = currentlyServed.find((turn) => turn.moduleId === moduleId);
       return serving;
@@ -90,36 +58,36 @@ export const ModuleDashboard = () => {
 
    return (
       <Container className="space-y-6">
-         {/* Encabezado */}
+         {/* Header */}
          <div>
             <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
                Panel de Gestión de Módulos
             </h1>
-            <div className="flex items-center justify-center gap-12 text-muted-foreground">
-               <TimerWatch />
-               <div className="flex items-center gap-2">
-                  <Users size={20} />
-                  <span>{stats?.waiting || 0} en espera</span>
-               </div>
-            </div>
+            <TimerWatch />
          </div>
 
-         {/* Acciones rápidas */}
-         <div className="rounded-md shadow p-6 border bg-card">
-            <h3 className="text-lg font-semibold mb-4">Acciones rápidas</h3>
-            <div className="flex flex-wrap gap-4">
-               <Button onClick={() => setActiveModal("module")}>
-                  <Plus size={18} />
-                  Crear módulo
-               </Button>
-               <Button onClick={() => window.location.reload()} variant={"outline"}>
-                  <RefreshCcw size={18} />
-                  Refrescar todo
-               </Button>
-
-               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-                  <span>Auto-refrescado cada 5 segundos</span>
+         {/* Quick Stats */}
+         <div className="bg-card rounded-md shadow p-6 border">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold">{stats?.waiting || 0}</div>
+                  <div className="text-sm text-muted-foreground">En espera</div>
+               </div>
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold">{stats?.beingServed || 0}</div>
+                  <div className="text-sm text-muted-foreground">Atendiéndose</div>
+               </div>
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-primary">
+                     {stats?.completed || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Completados</div>
+               </div>
+               <div className="bg-accent/50 shadow border p-4 rounded-md text-center">
+                  <div className="text-2xl font-bold text-primary">
+                     {stats?.totalToday || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Hoy</div>
                </div>
             </div>
          </div>
@@ -141,7 +109,7 @@ export const ModuleDashboard = () => {
             </div>
          )}
 
-         {/* Cuadrícula de módulos */}
+         {/* Main Content */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {modules.map((module) => {
                const serving = getModuleStatus(module.id);
@@ -253,68 +221,6 @@ export const ModuleDashboard = () => {
                );
             })}
          </div>
-
-         {/* Modal crear módulo */}
-         {activeModal === "module" && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-               <div className="relative p-6 rounded-xl shadow-lg w-96 max-w-[90vw] bg-white dark:bg-accent">
-                  <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-lg font-bold">Crear módulo</h2>
-                     <X
-                        onClick={() => {
-                           setActiveModal(null);
-                           moduleForm.reset();
-                        }}
-                        className="cursor-pointer text-muted-foreground hover:text-gray-700"
-                        size={20}
-                     />
-                  </div>
-
-                  <form
-                     onSubmit={moduleForm.handleSubmit(onCreateModule)}
-                     className="space-y-4"
-                  >
-                     <div>
-                        <label className="block text-sm font-medium mb-1">
-                           Nombre del módulo
-                        </label>
-                        <input
-                           {...moduleForm.register("name")}
-                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="Ingrese el nombre del módulo"
-                        />
-                        {moduleForm.formState.errors.name && (
-                           <p className="text-red-500 text-sm mt-1">
-                              {moduleForm.formState.errors.name.message}
-                           </p>
-                        )}
-                     </div>
-
-                     <div>
-                        <label className="block text-sm font-medium mb-1">
-                           Descripción
-                        </label>
-                        <textarea
-                           {...moduleForm.register("description")}
-                           rows={3}
-                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                           placeholder="Ingrese la descripción del módulo"
-                        />
-                        {moduleForm.formState.errors.description && (
-                           <p className="text-red-500 text-sm mt-1">
-                              {moduleForm.formState.errors.description.message}
-                           </p>
-                        )}
-                     </div>
-
-                     <Button type="submit" disabled={isLoading} className="w-full">
-                        <Plus size={18} />
-                        {isLoading ? "Creando..." : "Crear módulo"}
-                     </Button>
-                  </form>
-               </div>
-            </div>
-         )}
       </Container>
    );
 };

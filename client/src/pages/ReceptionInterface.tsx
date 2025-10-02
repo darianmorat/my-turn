@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueueStore } from "@/stores/useQueueStore";
-import { X, UserPlus, Ticket, Search, Users } from "lucide-react";
+import { X, UserPlus, Ticket, Search, Users, LoaderCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
+import { Modal } from "@/components/Modal";
+import type { User } from "@/types/user";
+import type { Turn } from "@/types/queue";
 
 const userFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -22,12 +25,21 @@ type UserFormData = z.infer<typeof userFormSchema>;
 type TurnFormData = z.infer<typeof turnFormSchema>;
 
 export const ReceptionInterface = () => {
-   const [activeModal, setActiveModal] = useState<"user" | "turn" | null>(null);
+   const [showModal, setShowModal] = useState({ active: false, for: "" });
+   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+   const [selectedTurn, setSelectedTurn] = useState<Turn | null>(null);
    const [searchTerm, setSearchTerm] = useState("");
 
    const { users, getUsers, createUser } = useUserStore();
-   const { waitingTurns, stats, createTurn, getWaitingTurns, getStats, isLoading } =
-      useQueueStore();
+   const {
+      waitingTurns,
+      stats,
+      createTurn,
+      cancelTurn,
+      getWaitingTurns,
+      getStats,
+      isLoading,
+   } = useQueueStore();
 
    const userForm = useForm<UserFormData>({
       resolver: zodResolver(userFormSchema),
@@ -59,14 +71,14 @@ export const ReceptionInterface = () => {
    const onCreateUser = async (data: UserFormData) => {
       await createUser(data.name, data.nationalId);
       userForm.reset();
-      setActiveModal(null);
+      handleModal("");
    };
 
    const onCreateTurn = async (data: TurnFormData) => {
       const turn = await createTurn(data.nationalId);
       if (turn) {
          turnForm.reset();
-         setActiveModal(null);
+         handleModal("");
          alert("Turno creado exitosamente"); // we should show the store msg, not this one
       }
    };
@@ -76,6 +88,18 @@ export const ReceptionInterface = () => {
          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
          user.nationalId.includes(searchTerm),
    );
+
+   const handleModal = (modal: string): void => {
+      setShowModal((prev) => ({ active: !prev.active, for: modal }));
+   };
+
+   const handleCancelTurn = async () => {
+      if (!selectedTurn) return;
+
+      await cancelTurn(selectedTurn.id);
+      handleModal("");
+      setSelectedTurn(null);
+   };
 
    return (
       <Container className="space-y-6">
@@ -116,7 +140,7 @@ export const ReceptionInterface = () => {
          {/* Action Buttons */}
          <div className="flex flex-wrap gap-4 justify-between">
             <div className="flex flex-wrap gap-4">
-               <Button onClick={() => setActiveModal("user")}>
+               <Button onClick={() => handleModal("user")}>
                   <UserPlus size={20} />
                   Crear Usuario
                </Button>
@@ -187,7 +211,7 @@ export const ReceptionInterface = () => {
                               <Button
                                  onClick={() => {
                                     turnForm.setValue("nationalId", user.nationalId);
-                                    setActiveModal("turn");
+                                    handleModal("turn");
                                  }}
                                  variant={"outline"}
                               >
@@ -229,11 +253,25 @@ export const ReceptionInterface = () => {
                                        {turn.user.name}
                                     </div>
                                  </div>
-                                 {index === 0 && (
-                                    <div className="bg-warning text-warning-foreground px-2 py-1 rounded text-xs font-bold">
-                                       SIGUIENTE
-                                    </div>
-                                 )}
+                                 <div className="flex items-center gap-2">
+                                    {index === 0 && (
+                                       <div className="bg-warning text-warning-foreground px-2 py-1 rounded text-xs font-bold">
+                                          SIGUIENTE
+                                       </div>
+                                    )}
+                                    <Button
+                                       onClick={() => {
+                                          handleModal("cancel");
+                                          setSelectedUser(turn.user);
+                                          setSelectedTurn(turn);
+                                       }}
+                                       variant="ghost"
+                                       size="sm"
+                                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    >
+                                       <X size={16} />
+                                    </Button>
+                                 </div>
                               </div>
                            </div>
                         ))}
@@ -250,16 +288,13 @@ export const ReceptionInterface = () => {
          </div>
 
          {/* Create User Modal */}
-         {activeModal === "user" && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+         {showModal.active && showModal.for === "user" && (
+            <Modal onClose={() => handleModal("")}>
                <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
                      <h2 className="text-lg font-bold">Crear Usuario</h2>
                      <X
-                        onClick={() => {
-                           setActiveModal(null);
-                           userForm.reset();
-                        }}
+                        onClick={() => handleModal("")}
                         className="cursor-pointer text-gray-500 hover:text-gray-700"
                         size={20}
                      />
@@ -303,20 +338,17 @@ export const ReceptionInterface = () => {
                      </Button>
                   </form>
                </div>
-            </div>
+            </Modal>
          )}
 
          {/* Assign Turn Modal */}
-         {activeModal === "turn" && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+         {showModal.active && showModal.for === "turn" && (
+            <Modal onClose={() => handleModal("")}>
                <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
                      <h2 className="text-lg font-bold">Asignar Turno</h2>
                      <X
-                        onClick={() => {
-                           setActiveModal(null);
-                           turnForm.reset();
-                        }}
+                        onClick={() => handleModal("")}
                         className="cursor-pointer text-gray-500 hover:text-gray-700"
                         size={20}
                      />
@@ -349,14 +381,63 @@ export const ReceptionInterface = () => {
                   <div className="mt-4 pt-4 border-t text-center text-sm">
                      ¿No esta registrado?{" "}
                      <button
-                        onClick={() => setActiveModal("user")}
+                        onClick={() => handleModal("user")}
                         className="text-blue-500 hover:text-blue-700 font-medium hover:underline"
                      >
                         Crear usuario
                      </button>
                   </div>
                </div>
-            </div>
+            </Modal>
+         )}
+
+         {/* Cancel Turn Modal */}
+         {showModal.active && showModal.for === "cancel" && (
+            <Modal onClose={() => handleModal("")}>
+               <div className="relative bg-background dark:bg-accent p-6 rounded-md m-4 w-full max-w-100 flex flex-col gap-2">
+                  <h1 className="text-2xl font-bold">Cancelar Turno</h1>
+                  <p className="text-muted-foreground text-sm">
+                     Confirma que quiere cancelar el turno para el usuario:
+                  </p>
+                  <div className="flex flex-col gap-0">
+                     <p className="text-muted-foreground text-sm">
+                        Nombre: <span className="font-bold">{selectedUser?.name}</span>
+                     </p>
+                     <p className="text-muted-foreground text-sm">
+                        ID: <span className="font-bold">{selectedUser?.nationalId}</span>
+                     </p>
+                  </div>
+                  <Button
+                     type="button"
+                     variant={"ghost"}
+                     className="absolute right-2 top-2 text-muted-foreground"
+                     onClick={() => handleModal("")}
+                  >
+                     <X />
+                  </Button>
+                  <div className="flex gap-2 pt-2">
+                     <Button
+                        variant={"default"}
+                        type="submit"
+                        onClick={() => handleCancelTurn()}
+                        disabled={isLoading}
+                        className="flex-1/2"
+                     >
+                        {isLoading && <LoaderCircle className="animate-spin" />}
+                        {isLoading ? "Eliminando" : "Aceptar"}
+                     </Button>
+                     <Button
+                        type="button"
+                        variant={"outline"}
+                        onClick={() => handleModal("")}
+                        disabled={isLoading}
+                        className="flex-1/2"
+                     >
+                        Cancelar
+                     </Button>
+                  </div>
+               </div>
+            </Modal>
          )}
       </Container>
    );

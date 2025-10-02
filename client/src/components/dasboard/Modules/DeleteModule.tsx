@@ -1,29 +1,29 @@
 import { Button } from "../../ui/button";
 import { LoaderCircle, X } from "lucide-react";
 import { Modal } from "../../Modal";
-import { useUserStore } from "@/stores/useUserStore";
-import type { User } from "@/types/user";
+import { useQueueStore } from "@/stores/useQueueStore";
+import type { Module } from "@/types/queue";
 
-type DeleteUserProps = {
+type DeleteModuleProps = {
    handleModal: () => void;
-   user: User;
+   module: Module;
 };
 
-export const DeleteUser = ({ handleModal, user }: DeleteUserProps) => {
-   const { isLoading, deleteUser } = useUserStore();
+export const DeleteModule = ({ handleModal, module }: DeleteModuleProps) => {
+   const { isLoading, deleteModule } = useQueueStore();
 
    const handleDelete = async () => {
-      await deleteUser(user.id);
+      await deleteModule(module.id);
       handleModal();
    };
 
    return (
       <Modal onClose={handleModal}>
          <div className="relative bg-background dark:bg-accent p-6 rounded-md m-4 w-full max-w-100 flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">Eliminar usuario</h1>
+            <h1 className="text-2xl font-bold">Eliminar módulo</h1>
             <p className="text-muted-foreground text-sm">
                Confirma que quiere eliminar {" "}
-               <span className="font-bold">{user.name}</span>?
+               <span className="font-bold">{module.name}</span>?
             </p>
             <Button
                type="button"

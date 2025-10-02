@@ -73,14 +73,33 @@ export const queueService = {
       }
    },
 
-   // Module actions
-   getAllModules: async () => {
-      return await db.select().from(modules);
-   },
+   cancelTurn: async (turnId: string) => {
+      const [turn] = await db.select().from(turns).where(eq(turns.id, turnId)).limit(1);
 
-   createModule: async (name: string, description: string) => {
-      const module = await db.insert(modules).values({ name, description }).returning();
-      return module;
+      if (!turn) {
+         throw new Error("Turn not found");
+      }
+
+      if (turn.status === "completed") {
+         throw new Error("Cannot cancel a completed turn");
+      }
+
+      if (turn.status === "cancelled") {
+         throw new Error("Turn is already cancelled");
+      }
+
+      // Update turn status to cancelled
+      await db
+         .update(turns)
+         .set({
+            status: "cancelled",
+            completedAt: new Date(), // Using completedAt as cancelledAt
+         })
+         .where(eq(turns.id, turnId));
+
+      // Return updated turn
+      const updatedTurn = await queueService.getTurnWithUser(turnId);
+      return updatedTurn!;
    },
 
    getNextInQueue: async () => {

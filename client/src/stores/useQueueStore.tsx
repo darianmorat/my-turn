@@ -13,6 +13,7 @@ type QueueStore = {
 
    // Reception actions
    createTurn: (nationalId: string) => Promise<Turn | null>;
+   cancelTurn: (turnId: string) => Promise<void>;
    getWaitingTurns: () => Promise<void>;
    getStats: () => Promise<void>;
 
@@ -24,6 +25,11 @@ type QueueStore = {
    // System actions
    getModules: () => Promise<void>;
    createModule: (name: string, description: string) => Promise<void>;
+   editModule: (
+      id: string,
+      updates: { name?: string; description?: string },
+   ) => Promise<void>;
+   deleteModule: (id: string) => Promise<void>;
 
    // Utils
    refreshAll: () => Promise<void>;
@@ -68,6 +74,29 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
          }
       } catch (error) {
          console.error("Failed to fetch waiting turns:", error);
+      }
+   },
+
+   cancelTurn: async (turnId: string) => {
+      try {
+         set({ isLoading: true });
+         const res = await api.post(`/queue/cancel/${turnId}`);
+
+         if (res.data.success) {
+            toast.success(res.data.message);
+
+            // Refresh waiting turns and stats
+            await Promise.all([
+               get().getWaitingTurns(),
+               get().getCurrentlyServed(),
+               get().getStats(),
+            ]);
+         }
+      } catch (error) {
+         const message = error?.response?.data?.message || "Failed to cancel turn";
+         toast.error(message);
+      } finally {
+         set({ isLoading: false });
       }
    },
 
@@ -149,30 +178,79 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
 
    // System actions
    getModules: async () => {
+      set({ isLoading: true });
       try {
-         const res = await api.get("/queue/modules");
+         const res = await api.get("/module/get-all");
 
          if (res.data.success) {
             set({ modules: res.data.modules });
          }
       } catch (error) {
-         console.error("Failed to fetch modules:", error);
+         toast.error(error.response.data.message);
+      } finally {
+         set({ isLoading: false });
       }
    },
 
    createModule: async (name, description) => {
+      set({ isLoading: true });
       try {
          const body = {
             name,
             description,
          };
-         const res = await api.post("/queue/modules/create", body);
+         const res = await api.post("/module/create", body);
 
          if (res.data.success) {
-            get().getModules();
+            toast.success(res.data.message);
+            const currentModules = get().modules;
+            const newModule = res.data.newModule;
+            set({ modules: [...currentModules, newModule] });
          }
       } catch (error) {
-         console.error("Failed to create modules:", error);
+         toast.error(error.response.data.message);
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   editModule: async (id, updates) => {
+      set({ isLoading: true });
+      try {
+         const res = await api.post(`/module/edit/${id}`, updates);
+
+         if (res.data.success) {
+            toast.success(res.data.message);
+            const currentModules = get().modules;
+            const updatedModule = res.data.module;
+            set({
+               modules: currentModules.map((module) =>
+                  module.id === id ? updatedModule : module,
+               ),
+            });
+         }
+      } catch (error) {
+         toast.error(error.response.data.message);
+      } finally {
+         set({ isLoading: false });
+      }
+   },
+
+   deleteModule: async (id) => {
+      set({ isLoading: true });
+      try {
+         const res = await api.post(`/module/delete/${id}`);
+
+         if (res.data.success) {
+            toast.success(res.data.message);
+            const currentModules = get().modules;
+            const updatedModules = currentModules.filter((module) => module.id !== id);
+            set({ modules: updatedModules });
+         }
+      } catch (error) {
+         toast.error(error.response.data.message);
+      } finally {
+         set({ isLoading: false });
       }
    },
 

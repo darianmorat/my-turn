@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { queueService } from "../services/queue.service";
+import { moduleService } from "../services/module.service";
 
 export const createTurn = async (req: Request, res: Response) => {
    try {
@@ -17,6 +18,24 @@ export const createTurn = async (req: Request, res: Response) => {
       res.status(200).json({
          success: true,
          message: `Turn created successfully. Ticket: ${turn.ticketCode}`,
+         turn,
+      });
+   } catch (error: any) {
+      res.status(500).json({
+         success: false,
+         message: error.message || "Failed to create turn",
+      });
+   }
+};
+
+export const cancelTurn = async (req: Request, res: Response) => {
+   try {
+      const { turnId } = req.params;
+      const turn = await queueService.cancelTurn(turnId);
+
+      return res.status(200).json({
+         success: true,
+         message: "Turno cancelado exitosamente",
          turn,
       });
    } catch (error: any) {
@@ -137,7 +156,7 @@ export const getQueueStats = async (_req: Request, res: Response) => {
 // Module actions
 export const getModules = async (_req: Request, res: Response) => {
    try {
-      const modules = await queueService.getAllModules();
+      const modules = await moduleService.getAll();
 
       res.status(200).json({
          success: true,
@@ -154,16 +173,63 @@ export const getModules = async (_req: Request, res: Response) => {
 export const createModule = async (req: Request, res: Response) => {
    try {
       const { name, description } = req.body;
-      const module = await queueService.createModule(name, description);
+      const exists = await moduleService.exists(name);
+
+      if (exists) {
+         return res.status(500).json({
+            success: false,
+            message: "Nombre de modulo ya existe",
+         });
+      }
+
+      const module = await moduleService.create(name, description);
 
       res.status(200).json({
          success: true,
-         module,
+         message: "Módulo creado",
+         newModule: module,
       });
    } catch {
       res.status(500).json({
          success: false,
          message: "Failed to get modules",
+      });
+   }
+};
+
+export const editModule = async (req: Request, res: Response) => {
+   try {
+      const { name, description } = req.body;
+      const { id } = req.params;
+
+      const module = await moduleService.edit(id, { name, description });
+
+      res.status(200).json({
+         success: true,
+         message: "Información actualizada",
+         module: module,
+      });
+   } catch {
+      res.status(500).json({
+         success: false,
+         message: "server error",
+      });
+   }
+};
+
+export const deleteModule = async (req: Request, res: Response) => {
+   try {
+      const { id } = req.params;
+      const module = await moduleService.delete(id);
+
+      res.status(200).json({
+         success: true,
+         message: `${module.name} eliminado`,
+      });
+   } catch {
+      res.status(500).json({
+         success: false,
+         message: "server error",
       });
    }
 };

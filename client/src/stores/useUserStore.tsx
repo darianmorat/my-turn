@@ -42,7 +42,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
          if (res.data.success) {
             toast.success(res.data.message);
-
             const currentUsers = get().users;
             const newUser = res.data.newUser;
             set({ users: [...currentUsers, newUser] });
