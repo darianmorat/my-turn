@@ -76,10 +76,9 @@ export const ReceptionInterface = () => {
 
    const onCreateTurn = async (data: TurnFormData) => {
       const turn = await createTurn(data.nationalId);
+
       if (turn) {
-         turnForm.reset();
          handleModal("");
-         alert("Turno creado exitosamente"); // we should show the store msg, not this one
       }
    };
 

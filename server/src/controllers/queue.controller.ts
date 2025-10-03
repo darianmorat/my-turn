@@ -9,7 +9,7 @@ export const createTurn = async (req: Request, res: Response) => {
       if (!nationalId) {
          return res.status(400).json({
             success: false,
-            message: "National ID is required",
+            message: "National ID es requerido",
          });
       }
 
@@ -17,13 +17,13 @@ export const createTurn = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `Turn created successfully. Ticket: ${turn.ticketCode}`,
-         turn,
+         message: `Turno creado. Ticket: ${turn.ticketCode}`,
+         turn: turn,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
-         message: error.message || "Failed to create turn",
+         message: "Failed to create turn",
       });
    }
 };
@@ -38,10 +38,10 @@ export const cancelTurn = async (req: Request, res: Response) => {
          message: "Turno cancelado exitosamente",
          turn,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
-         message: error.message || "Failed to create turn",
+         message: "Failed to create turn",
       });
    }
 };
@@ -54,7 +54,7 @@ export const getWaitingTurns = async (_req: Request, res: Response) => {
          success: true,
          turns,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
          message: "Failed to get waiting turns",
@@ -70,7 +70,7 @@ export const getCurrentlyServed = async (_req: Request, res: Response) => {
          success: true,
          turns,
       });
-   } catch (error: any) {
+   } catch {
       res.status(500).json({
          success: false,
          message: "Failed to get currently served turns",
@@ -104,10 +104,10 @@ export const callNext = async (req: Request, res: Response) => {
          message: `${result.ticketCode} called to module`,
          turn: result,
       });
-   } catch (error: any) {
+   } catch {
       res.status(400).json({
          success: false,
-         message: error.message || "Failed to call next person",
+         message: "Failed to call next person",
       });
    }
 };

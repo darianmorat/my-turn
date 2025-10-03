@@ -48,18 +48,15 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       try {
          const body = { nationalId: nationalId };
          const res = await api.post("/queue/create", body);
+         const turn = res.data.turn;
 
          if (res.data.success) {
-            const turn = res.data.turn;
             toast.success(res.data.message);
-
             get().getWaitingTurns();
-
             return turn;
          }
       } catch (error) {
-         const message = error?.response?.data?.message || "Failed to create turn";
-         toast.error(message);
+         toast.error(error.response.data.message);
       } finally {
          set({ isLoading: false });
       }
@@ -73,7 +70,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
             set({ waitingTurns: res.data.turns });
          }
       } catch (error) {
-         console.error("Failed to fetch waiting turns:", error);
+         toast.error(error.response.data.message);
       }
    },
 
@@ -93,8 +90,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
             ]);
          }
       } catch (error) {
-         const message = error?.response?.data?.message || "Failed to cancel turn";
-         toast.error(message);
+         toast.error(error.response.data.message);
       } finally {
          set({ isLoading: false });
       }
@@ -108,7 +104,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
             set({ stats: res.data.stats });
          }
       } catch (error) {
-         console.error("Failed to fetch queue stats:", error);
+         toast.error(error.response.data.message);
       }
    },
 
@@ -137,8 +133,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
          }
          return null;
       } catch (error) {
-         const message = error?.response?.data?.message || "Failed to call next person";
-         toast.error(message);
+         toast.error(error.response.data.message);
          return null;
       } finally {
          set({ isLoading: false });
@@ -157,8 +152,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
             await Promise.all([get().getCurrentlyServed(), get().getStats()]);
          }
       } catch (error) {
-         const message = error?.response?.data?.message || "Failed to complete service";
-         toast.error(message);
+         toast.error(error.response.data.message);
       } finally {
          set({ isLoading: false });
       }
