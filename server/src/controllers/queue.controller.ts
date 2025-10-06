@@ -11,7 +11,7 @@ export const createTurn = async (req: Request, res: Response) => {
       if (!nationalId) {
          return res.status(400).json({
             success: false,
-            message: "National ID es requerido",
+            message: "ID es requerido",
          });
       }
 
@@ -19,13 +19,27 @@ export const createTurn = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `Turno creado. Ticket: ${turn.ticketCode}`,
+         message: `Turno creado\n Ticket: ${turn.ticketCode}`,
          turn: turn,
       });
-   } catch {
+   } catch (error: any) {
+      if (error.message === "Ya tienes un turno activo") {
+         return res.status(409).json({
+            success: false,
+            message: "Ya tienes un turno activo",
+         });
+      }
+
+      if (error.message === "Usuario no encontrado") {
+         return res.status(404).json({
+            success: false,
+            message: "Usuario no encontrado",
+         });
+      }
+
       res.status(500).json({
          success: false,
-         message: "Failed to create turn",
+         message: "Error del servidor",
       });
    }
 };
@@ -37,13 +51,13 @@ export const cancelTurn = async (req: Request, res: Response) => {
 
       return res.status(200).json({
          success: true,
-         message: "Turno cancelado exitosamente",
+         message: "Turno cancelado",
          turn,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to create turn",
+         message: "Error del servidor",
       });
    }
 };
@@ -59,7 +73,7 @@ export const getWaitingTurns = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to get waiting turns",
+         message: "Error del servidor",
       });
    }
 };
@@ -75,7 +89,7 @@ export const getCurrentlyServed = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to get currently served turns",
+         message: "Error del servidor",
       });
    }
 };
@@ -90,12 +104,11 @@ export const takeModule = async (req: AuthRequest, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Módulo tomado",
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "Error tomando el módulo",
+         message: "Error del servidor",
       });
    }
 };
@@ -107,12 +120,11 @@ export const leaveModule = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Módulo abandonnado",
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "Error abandonando el módulo",
+         message: "Error del servidor",
       });
    }
 };
@@ -124,7 +136,7 @@ export const callNext = async (req: Request, res: Response) => {
       if (!moduleId) {
          return res.status(400).json({
             success: false,
-            message: "Module ID is required",
+            message: "ID del módulo es requerido",
          });
       }
 
@@ -133,20 +145,19 @@ export const callNext = async (req: Request, res: Response) => {
       if (!result) {
          return res.status(200).json({
             success: true,
-            message: "No one waiting in queue",
+            message: "No hay personas en espera",
             turn: null,
          });
       }
 
       res.status(200).json({
          success: true,
-         message: `${result.ticketCode} called to module`,
          turn: result,
       });
    } catch {
       res.status(400).json({
          success: false,
-         message: "Failed to call next person",
+         message: "Error del servidor",
       });
    }
 };
@@ -159,7 +170,7 @@ export const completeTurn = async (req: Request, res: Response) => {
       if (!turnId) {
          return res.status(400).json({
             success: false,
-            message: "Turn ID is required",
+            message: "ID del turno es requerido",
          });
       }
 
@@ -167,12 +178,11 @@ export const completeTurn = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Service completed successfully",
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to complete service",
+         message: "Error del servidor",
       });
    }
 };
@@ -188,7 +198,7 @@ export const getQueueStats = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to get queue statistics",
+         message: "Error del servidor",
       });
    }
 };
@@ -205,7 +215,7 @@ export const getModules = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to get modules",
+         message: "Error del servidor",
       });
    }
 };
@@ -218,7 +228,7 @@ export const createModule = async (req: Request, res: Response) => {
       if (exists) {
          return res.status(500).json({
             success: false,
-            message: "Nombre de modulo ya existe",
+            message: "El nombre del módulo ya existe",
          });
       }
 
@@ -226,13 +236,13 @@ export const createModule = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Módulo creado",
+         message: `Módulo creado: ${module.name}`,
          newModule: module,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "Failed to get modules",
+         message: "Error del servidor",
       });
    }
 };
@@ -246,13 +256,13 @@ export const editModule = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Información actualizada",
+         message: `Módulo actualizado: ${module.name}`,
          module: module,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -264,12 +274,12 @@ export const deleteModule = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `${module.name} eliminado`,
+         message: `Módulo eliminado: ${module.name}`,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };

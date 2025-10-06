@@ -12,7 +12,7 @@ export const getUsers = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -35,13 +35,13 @@ export const createUser = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `Usuario "${user.name}" creado`,
+         message: `Personal creado: ${user.name}`,
          newUser: user,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -50,17 +50,18 @@ export const editUser = async (req: Request, res: Response) => {
    try {
       const { name, email, password, role } = req.body;
       const { id } = req.params;
+
       const user = await personalService.edit(id, { name, email, password, role });
 
       res.status(200).json({
          success: true,
-         message: "Información actualizada",
+         message: `Personal actualizado: ${user.name}`,
          user: user,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -72,12 +73,12 @@ export const deleteUser = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `Usuario "${user.name}" eliminado`,
+         message: `Personal eliminado: ${user.name}`,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };

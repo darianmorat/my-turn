@@ -18,7 +18,7 @@ type QueueStore = {
    getStats: () => Promise<void>;
 
    // Agent actions
-   callNext: (moduleId: string) => Promise<Turn | null>;
+   callNext: (moduleId: string) => Promise<void>;
    completeTurn: (turnId: string, agentId: string) => Promise<void>;
    getCurrentlyServed: () => Promise<void>;
    takeModule: (moduleId: string) => Promise<void>;
@@ -58,7 +58,15 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
             return turn;
          }
       } catch (error) {
-         toast.error(error.response.data.message);
+         const errorMsg = error.response.data.message;
+
+         if (errorMsg === "Ya tienes un turno activo") {
+            toast.warning(errorMsg);
+         } else if (errorMsg === "Usuario no encontrado") {
+            toast.error(errorMsg);
+         } else {
+            toast.error(errorMsg);
+         }
       } finally {
          set({ isLoading: false });
       }
@@ -83,13 +91,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
 
          if (res.data.success) {
             toast.success(res.data.message);
-
-            // Refresh waiting turns and stats
-            await Promise.all([
-               get().getWaitingTurns(),
-               get().getCurrentlyServed(),
-               get().getStats(),
-            ]);
+            await get().refreshAll();
          }
       } catch (error) {
          toast.error(error.response.data.message);
@@ -117,26 +119,10 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
          const res = await api.post("/queue/call-next", { moduleId });
 
          if (res.data.success) {
-            if (res.data.turn) {
-               toast.success(res.data.message);
-
-               // Refresh both waiting and currently served
-               await Promise.all([
-                  get().getWaitingTurns(),
-                  get().getCurrentlyServed(),
-                  get().getStats(),
-               ]);
-
-               return res.data.turn;
-            } else {
-               toast.info("No one waiting in queue");
-               return null;
-            }
+            await get().refreshAll();
          }
-         return null;
       } catch (error) {
          toast.error(error.response.data.message);
-         return null;
       } finally {
          set({ isLoading: false });
       }
@@ -149,10 +135,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
          const res = await api.post(`/queue/complete/${turnId}`, body);
 
          if (res.data.success) {
-            toast.success(res.data.message);
-
-            // Refresh currently served and stats
-            await Promise.all([get().getCurrentlyServed(), get().getStats()]);
+            await get().refreshAll();
          }
       } catch (error) {
          toast.error(error.response.data.message);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueueStore } from "@/stores/useQueueStore";
-import { X, UserPlus, Ticket, Search, Users, LoaderCircle } from "lucide-react";
+import { X, UserPlus, Search, Users, LoaderCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,7 +30,7 @@ export const ReceptionInterface = () => {
    const [selectedTurn, setSelectedTurn] = useState<Turn | null>(null);
    const [searchTerm, setSearchTerm] = useState("");
 
-   const { users, getUsers, createUser } = useUserStore();
+   const { isLoading: isUserLoading, users, getUsers, createUser } = useUserStore();
    const {
       waitingTurns,
       stats,
@@ -70,7 +70,6 @@ export const ReceptionInterface = () => {
 
    const onCreateUser = async (data: UserFormData) => {
       await createUser(data.name, data.nationalId);
-      userForm.reset();
       handleModal("");
    };
 
@@ -291,7 +290,7 @@ export const ReceptionInterface = () => {
             <Modal onClose={() => handleModal("")}>
                <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-lg font-bold">Crear Usuario</h2>
+                     <h2 className="text-lg font-bold">Nuevo Usuario</h2>
                      <X
                         onClick={() => handleModal("")}
                         className="cursor-pointer text-gray-500 hover:text-gray-700"
@@ -331,9 +330,9 @@ export const ReceptionInterface = () => {
                         )}
                      </div>
 
-                     <Button type="submit" disabled={isLoading} className="w-full">
-                        <UserPlus size={18} />
-                        {isLoading ? "Creando..." : "Crear Usuario"}
+                     <Button type="submit" disabled={isUserLoading} className="w-full">
+                        {isUserLoading && <LoaderCircle className="animate-spin" />}
+                        {isUserLoading ? "Guardando..." : "Guardar"}
                      </Button>
                   </form>
                </div>
@@ -345,7 +344,7 @@ export const ReceptionInterface = () => {
             <Modal onClose={() => handleModal("")}>
                <div className="relative bg-white dark:bg-accent p-6 rounded-xl shadow-lg w-96 max-w-[90vw]">
                   <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-lg font-bold">Asignar Turno</h2>
+                     <h2 className="text-lg font-bold">Nuevo turno</h2>
                      <X
                         onClick={() => handleModal("")}
                         className="cursor-pointer text-gray-500 hover:text-gray-700"
@@ -372,20 +371,10 @@ export const ReceptionInterface = () => {
                      </div>
 
                      <Button type="submit" disabled={isLoading} className="w-full">
-                        <Ticket size={18} />
-                        {isLoading ? "Creando Turno..." : "Asignar Turno"}
+                        {isLoading && <LoaderCircle className="animate-spin" />}
+                        {isLoading ? "Guardando..." : "Guardar"}
                      </Button>
                   </form>
-
-                  <div className="mt-4 pt-4 border-t text-center text-sm">
-                     ¿No esta registrado?{" "}
-                     <button
-                        onClick={() => handleModal("user")}
-                        className="text-blue-500 hover:text-blue-700 font-medium hover:underline"
-                     >
-                        Crear usuario
-                     </button>
-                  </div>
                </div>
             </Modal>
          )}
@@ -423,7 +412,7 @@ export const ReceptionInterface = () => {
                         className="flex-1/2"
                      >
                         {isLoading && <LoaderCircle className="animate-spin" />}
-                        {isLoading ? "Eliminando" : "Aceptar"}
+                        {isLoading ? "Cancelando" : "Aceptar"}
                      </Button>
                      <Button
                         type="button"

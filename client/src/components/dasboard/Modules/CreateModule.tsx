@@ -42,7 +42,7 @@ export const CreateModule = ({ handleModal }: CreateModuleProps) => {
             <form onSubmit={form.handleSubmit(onSubmit)}>
                <div className="relative flex flex-col justify-between bg-background dark:bg-accent w-screen sm:w-lg h-full overflow-y-auto">
                   <div className="p-6 bg-accent border-b-1 sticky top-0 z-10">
-                     <h1 className="text-2xl font-bold">Crear módulo</h1>
+                     <h1 className="text-2xl font-bold">Nuevo módulo</h1>
                      <p className="text-muted-foreground text-sm">
                         Completa la información para crear un nuevo módulo
                      </p>
@@ -116,7 +116,7 @@ export const CreateModule = ({ handleModal }: CreateModuleProps) => {
                         className="flex-1/2"
                      >
                         {isLoading && <LoaderCircle className="animate-spin" />}
-                        {isLoading ? "Creando" : "Crear"}
+                        {isLoading ? "Guardando" : "Guardar"}
                      </Button>
                      <Button
                         type="button"

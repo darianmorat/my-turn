@@ -1,6 +1,14 @@
 import { useEffect } from "react";
 import { useQueueStore } from "@/stores/useQueueStore";
-import { UserCheck, CheckCircle, Users, Phone } from "lucide-react";
+import {
+   UserCheck,
+   CheckCircle,
+   Users,
+   Phone,
+   PhoneOff,
+   LogInIcon,
+   LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
@@ -41,10 +49,7 @@ export const ModuleDashboard = () => {
    }, []);
 
    const handleCallNext = async (moduleId: string) => {
-      const turn = await callNext(moduleId);
-      if (turn) {
-         console.log(`Llamado ${turn.ticketCode} al Módulo ${moduleId}`);
-      }
+      await callNext(moduleId);
    };
 
    const handleComplete = async (turnId: string) => {
@@ -142,7 +147,7 @@ export const ModuleDashboard = () => {
                      >
                         {/* Encabezado del módulo */}
                         <div
-                           className={`p-4 ${isAvailable ? "bg-blue-500" : "bg-green-500"} text-white`}
+                           className={`p-4 ${isAvailable ? "bg-blue-500 dark:bg-blue-600/50" : "bg-green-500 dark:bg-green-600/50"} text-white`}
                         >
                            <div className="flex items-center justify-between">
                               <h3 className="font-bold text-lg">{module.name}</h3>
@@ -218,7 +223,11 @@ export const ModuleDashboard = () => {
                                        variant={shouldDisable ? "secondary" : "outline"}
                                        className="w-full mb-4"
                                     >
-                                       <Phone size={18} />
+                                       {canCallNext ? (
+                                          <Phone size={18} />
+                                       ) : (
+                                          <PhoneOff size={18} />
+                                       )}
                                        {canCallNext
                                           ? "Llamar siguiente"
                                           : "Nadie en espera"}
@@ -253,8 +262,9 @@ export const ModuleDashboard = () => {
                                     variant={shouldDisable ? "outline" : "default"}
                                     onClick={() => handleTakeModule(module.id)}
                                     disabled={shouldDisable}
-                                    className="w-full bg-blue-500 hover:bg-blue-400"
+                                    className={`w-full ${!shouldDisable && "bg-blue-500 hover:bg-blue-400 text-white"}`}
                                  >
+                                    <LogInIcon />
                                     Tomar módulo
                                  </Button>
                               </div>
@@ -266,7 +276,8 @@ export const ModuleDashboard = () => {
                                  variant="destructive"
                                  className="w-full mt-2"
                               >
-                                 Abandonar módulo
+                                 <LogOut />
+                                 Dejar módulo
                               </Button>
                            )}
                         </div>

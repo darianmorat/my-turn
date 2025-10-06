@@ -1,4 +1,4 @@
-import { asc, eq, and, sql } from "drizzle-orm";
+import { asc, eq, sql, and, or } from "drizzle-orm";
 import { db } from "../db";
 import { modules, queue, turns, users } from "../db/schema";
 
@@ -11,7 +11,22 @@ export const queueService = {
          .limit(1);
 
       if (!user) {
-         throw new Error("User not found. Please register first.");
+         throw new Error("Usuario no encontrado");
+      }
+
+      const [existingTurn] = await db
+         .select()
+         .from(turns)
+         .where(
+            and(
+               eq(turns.userId, user.id),
+               or(eq(turns.status, "waiting"), eq(turns.status, "being_served")),
+            ),
+         )
+         .limit(1);
+
+      if (existingTurn) {
+         throw new Error("Ya tienes un turno activo");
       }
 
       return queueService.createTurnForUser(user.id, user.name, user.nationalId);
@@ -40,82 +55,62 @@ export const queueService = {
       userName: string,
       userNationalId: string,
    ) => {
-      try {
-         const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toISOString().split("T")[0];
 
-         // Get/create daily counter for ticket codes
-         let counter = await db
-            .select()
-            .from(queue)
-            .where(eq(queue.serviceDate, today))
-            .limit(1);
+      // Get/create daily counter for ticket codes
+      let counter = await db
+         .select()
+         .from(queue)
+         .where(eq(queue.serviceDate, today))
+         .limit(1);
 
-         if (counter.length === 0) {
-            const [newCounter] = await db
-               .insert(queue)
-               .values({
-                  currentNumber: 0,
-                  serviceDate: today,
-               })
-               .returning();
-            counter = [newCounter];
-         }
-
-         // Increment ticket counter
-         const currentTicketNumber = counter[0]?.currentNumber ?? 0;
-         const newTicketNumber = currentTicketNumber + 1;
-
-         await db
-            .update(queue)
-            .set({ currentNumber: newTicketNumber })
-            .where(eq(queue.serviceDate, today));
-
-         const ticketCode = `A${newTicketNumber.toString().padStart(3, "0")}`;
-
-         const [newTurn] = await db
-            .insert(turns)
+      if (counter.length === 0) {
+         const [newCounter] = await db
+            .insert(queue)
             .values({
-               userId,
-               userName,
-               userNationalId,
-               ticketCode,
-               status: "waiting",
+               currentNumber: 0,
                serviceDate: today,
             })
             .returning();
-
-         const turnWithUser = await queueService.getTurnWithUser(newTurn.id);
-         return turnWithUser!;
-      } catch (error) {
-         throw new Error(`Failed to create turn: ${error}`);
+         counter = [newCounter];
       }
+
+      // Increment ticket counter
+      const currentTicketNumber = counter[0]?.currentNumber ?? 0;
+      const newTicketNumber = currentTicketNumber + 1;
+
+      await db
+         .update(queue)
+         .set({ currentNumber: newTicketNumber })
+         .where(eq(queue.serviceDate, today));
+
+      const ticketCode = `A${newTicketNumber.toString().padStart(3, "0")}`;
+
+      const [newTurn] = await db
+         .insert(turns)
+         .values({
+            userId,
+            userName,
+            userNationalId,
+            ticketCode,
+            status: "waiting",
+            serviceDate: today,
+         })
+         .returning();
+
+      const turnWithUser = await queueService.getTurnWithUser(newTurn.id);
+      return turnWithUser!;
    },
 
    cancelTurn: async (turnId: string) => {
-      const [turn] = await db.select().from(turns).where(eq(turns.id, turnId)).limit(1);
-
-      if (!turn) {
-         throw new Error("Turn not found");
-      }
-
-      if (turn.status === "completed") {
-         throw new Error("Cannot cancel a completed turn");
-      }
-
-      if (turn.status === "cancelled") {
-         throw new Error("Turn is already cancelled");
-      }
-
-      // Update turn status to cancelled
       await db
          .update(turns)
          .set({
             status: "cancelled",
-            completedAt: new Date(), // Using completedAt as cancelledAt
+            completedAt: new Date(),
          })
          .where(eq(turns.id, turnId));
 
-      // Return updated turn
       const updatedTurn = await queueService.getTurnWithUser(turnId);
       return updatedTurn!;
    },
@@ -138,40 +133,22 @@ export const queueService = {
    },
 
    assignToModule: async (moduleId: string) => {
-      try {
-         // Get next person in queue
-         const nextTurn = await queueService.getNextInQueue();
-         if (!nextTurn) {
-            throw new Error("No one waiting in queue");
-         }
-
-         // Check if module is available (not currently serving someone)
-         const moduleInUse = await db
-            .select()
-            .from(turns)
-            .where(and(eq(turns.moduleId, moduleId), eq(turns.status, "being_served")))
-            .limit(1);
-
-         if (moduleInUse.length > 0) {
-            throw new Error("Module is currently busy");
-         }
-
-         // Assign turn to module
-         await db
-            .update(turns)
-            .set({
-               moduleId,
-               status: "being_served",
-               calledAt: new Date(),
-            })
-            .where(eq(turns.id, nextTurn.id));
-
-         // Return updated turn
-         const updatedTurn = await queueService.getTurnWithUser(nextTurn.id);
-         return updatedTurn!;
-      } catch (error) {
-         throw new Error(`Failed to assign to module: ${error}`);
+      const nextTurn = await queueService.getNextInQueue();
+      if (!nextTurn) {
+         throw new Error("No one waiting in queue");
       }
+
+      await db
+         .update(turns)
+         .set({
+            moduleId,
+            status: "being_served",
+            calledAt: new Date(),
+         })
+         .where(eq(turns.id, nextTurn.id));
+
+      const updatedTurn = await queueService.getTurnWithUser(nextTurn.id);
+      return updatedTurn!;
    },
 
    completeTurn: async (turnId: string, agentId: string) => {

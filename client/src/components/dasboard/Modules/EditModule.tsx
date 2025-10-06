@@ -150,7 +150,7 @@ export const EditModule = ({ handleModal, module }: EditModuleProps) => {
                         className="flex-1/2"
                      >
                         {isLoading && <LoaderCircle className="animate-spin" />}
-                        {isLoading ? "Editando" : "Editar"}
+                        {isLoading ? "Guardando" : "Guardar"}
                      </Button>
                      <Button
                         type="button"

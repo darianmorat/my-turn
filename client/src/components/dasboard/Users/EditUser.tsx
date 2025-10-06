@@ -148,7 +148,7 @@ export const EditUser = ({ handleModal, user }: EditUserProps) => {
                         className="flex-1/2"
                      >
                         {isLoading && <LoaderCircle className="animate-spin" />}
-                        {isLoading ? "Editando" : "Editar"}
+                        {isLoading ? "Guardando" : "Guardar"}
                      </Button>
                      <Button
                         type="button"

@@ -43,7 +43,7 @@ export const authenticate = async (req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -59,7 +59,7 @@ export const logout = (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };

@@ -103,7 +103,7 @@ export const EditUser = ({ handleModal, user }: EditUserProps) => {
             <form onSubmit={form.handleSubmit(onSubmit)}>
                <div className="relative flex flex-col justify-between bg-background dark:bg-accent w-screen sm:w-lg h-full overflow-y-auto">
                   <div className="p-6 bg-accent border-b-1 sticky top-0 z-10">
-                     <h1 className="text-2xl font-bold">Editar usuario</h1>
+                     <h1 className="text-2xl font-bold">Editar personal</h1>
                      <p className="text-muted-foreground text-sm">
                         Completa la información para editar la cuenta
                      </p>
@@ -228,7 +228,7 @@ export const EditUser = ({ handleModal, user }: EditUserProps) => {
                         className="flex-1/2"
                      >
                         {isLoading && <LoaderCircle className="animate-spin" />}
-                        {isLoading ? "Editando" : "Editar"}
+                        {isLoading ? "Guardando" : "Guardar"}
                      </Button>
                      <Button
                         type="button"

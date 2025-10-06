@@ -121,4 +121,7 @@
    [role="button"]:not([disabled]) {
       cursor: pointer;
    }
+   .Toastify__toast {
+      white-space: pre-line;
+   }
 }

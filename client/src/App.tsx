@@ -107,7 +107,7 @@ function App() {
          <ToastContainer
             className="mb-[-15px]"
             theme="colored"
-            autoClose={4500}
+            autoClose={3000}
             position="bottom-center"
             transition={Bounce}
             pauseOnHover={false}

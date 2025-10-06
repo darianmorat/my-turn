@@ -12,7 +12,7 @@ export const getAll = async (_req: Request, res: Response) => {
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -22,15 +22,15 @@ export const createUser = async (req: Request, res: Response) => {
       const { name, nationalId } = req.body;
       const user = await userService.createUser(name, nationalId);
 
-      res.status(200).json({
+      res.status(201).json({
          success: true,
-         message: "Usuario creado",
+         message: `Usuario creado: ${user.name}`,
          newUser: user,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -43,13 +43,13 @@ export const editUser = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: "Información actualizada",
+         message: `Usuario actualizado: ${user.name}`,
          user: user,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
@@ -61,12 +61,12 @@ export const deleteUser = async (req: Request, res: Response) => {
 
       res.status(200).json({
          success: true,
-         message: `Usuario "${user.name}" eliminado`,
+         message: `Usuario eliminado: ${user.name}`,
       });
    } catch {
       res.status(500).json({
          success: false,
-         message: "server error",
+         message: "Error del servidor",
       });
    }
 };
