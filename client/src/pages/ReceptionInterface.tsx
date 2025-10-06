@@ -265,7 +265,7 @@ export const ReceptionInterface = () => {
                                           setSelectedTurn(turn);
                                        }}
                                        variant="ghost"
-                                       size="sm"
+                                       size="icon"
                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                     >
                                        <X size={16} />

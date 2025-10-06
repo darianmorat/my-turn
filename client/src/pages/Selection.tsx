@@ -85,8 +85,8 @@ export const Selection = () => {
                               </div>
                            </div>
                            <Button
-                              className="w-full mt-auto h-9"
-                              size="sm"
+                              className="w-full mt-auto"
+                              size="lg"
                               onClick={(e) => {
                                  e.stopPropagation();
                                  item.action();

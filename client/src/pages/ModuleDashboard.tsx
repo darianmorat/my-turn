@@ -20,7 +20,6 @@ export const ModuleDashboard = () => {
       getModules,
       getWaitingTurns,
       getStats,
-      isLoading,
    } = useQueueStore();
 
    const { user } = useAuthStore();
@@ -179,7 +178,6 @@ export const ModuleDashboard = () => {
                                  {module.currentAgent === user?.id && (
                                     <Button
                                        onClick={() => handleComplete(serving.id)}
-                                       disabled={isLoading}
                                        className="w-full"
                                     >
                                        <CheckCircle size={18} />
@@ -216,9 +214,7 @@ export const ModuleDashboard = () => {
                                  {module.currentAgent === user?.id && (
                                     <Button
                                        onClick={() => handleCallNext(module.id)}
-                                       disabled={
-                                          !canCallNext || isLoading || shouldDisable
-                                       }
+                                       disabled={!canCallNext || shouldDisable}
                                        variant={shouldDisable ? "secondary" : "outline"}
                                        className="w-full mb-4"
                                     >
@@ -258,7 +254,6 @@ export const ModuleDashboard = () => {
                                     onClick={() => handleTakeModule(module.id)}
                                     disabled={shouldDisable}
                                     className="w-full bg-blue-500 hover:bg-blue-400"
-                                    size="sm"
                                  >
                                     Tomar módulo
                                  </Button>
@@ -270,7 +265,6 @@ export const ModuleDashboard = () => {
                                  onClick={() => handleLeaveModule(module.id)}
                                  variant="destructive"
                                  className="w-full mt-2"
-                                 size="sm"
                               >
                                  Abandonar módulo
                               </Button>
