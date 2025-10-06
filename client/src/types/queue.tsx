@@ -1,3 +1,4 @@
+import type { Personal } from "./personal";
 import type { User } from "./user";
 
 export type TurnStatus = "waiting" | "being_served" | "completed" | "cancelled";
@@ -7,7 +8,8 @@ export type Module = {
    name: string;
    description?: string;
    isActive: boolean;
-   agentName?: string;
+   currentAgent?: string;
+   agent?: Personal;
 };
 
 export type Turn = {

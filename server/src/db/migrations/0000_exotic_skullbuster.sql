@@ -13,7 +13,7 @@ CREATE TABLE "modules" (
 	"name" varchar(100) NOT NULL,
 	"description" varchar(255),
 	"is_active" boolean DEFAULT true,
-	"agent_name" varchar(255),
+	"current_agent" uuid,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
@@ -28,6 +28,7 @@ CREATE TABLE "turns" (
 	"created_at" timestamp DEFAULT now(),
 	"called_at" timestamp,
 	"completed_at" timestamp,
+	"completed_by" uuid,
 	"service_date" date DEFAULT now(),
 	CONSTRAINT "turns_ticket_code_unique" UNIQUE("ticket_code")
 );
@@ -48,5 +49,7 @@ CREATE TABLE "personal" (
 	CONSTRAINT "personal_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
+ALTER TABLE "modules" ADD CONSTRAINT "modules_current_agent_personal_id_fk" FOREIGN KEY ("current_agent") REFERENCES "public"."personal"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "turns" ADD CONSTRAINT "turns_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "turns" ADD CONSTRAINT "turns_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "turns" ADD CONSTRAINT "turns_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "turns" ADD CONSTRAINT "turns_completed_by_personal_id_fk" FOREIGN KEY ("completed_by") REFERENCES "public"."personal"("id") ON DELETE no action ON UPDATE no action;

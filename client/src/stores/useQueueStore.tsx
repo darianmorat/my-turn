@@ -19,8 +19,10 @@ type QueueStore = {
 
    // Agent actions
    callNext: (moduleId: string) => Promise<Turn | null>;
-   completeTurn: (turnId: string) => Promise<void>;
+   completeTurn: (turnId: string, agentId: string) => Promise<void>;
    getCurrentlyServed: () => Promise<void>;
+   takeModule: (moduleId: string) => Promise<void>;
+   leaveModule: (moduleId: string) => Promise<void>;
 
    // System actions
    getModules: () => Promise<void>;
@@ -140,10 +142,11 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
       }
    },
 
-   completeTurn: async (turnId: string) => {
+   completeTurn: async (turnId: string, agentId: string) => {
+      set({ isLoading: true });
       try {
-         set({ isLoading: true });
-         const res = await api.post(`/queue/complete/${turnId}`);
+         const body = { agentId };
+         const res = await api.post(`/queue/complete/${turnId}`, body);
 
          if (res.data.success) {
             toast.success(res.data.message);
@@ -167,6 +170,32 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
          }
       } catch (error) {
          console.error("Failed to fetch currently served turns:", error);
+      }
+   },
+
+   takeModule: async (moduleId) => {
+      try {
+         const body = { moduleId };
+         const res = await api.post("/queue/take-module", body);
+
+         if (res.data.success) {
+            get().getModules();
+         }
+      } catch (error) {
+         toast.error(error.response.data.message);
+      }
+   },
+
+   leaveModule: async (moduleId) => {
+      try {
+         const body = { moduleId };
+         const res = await api.post("/queue/leave-module", body);
+
+         if (res.data.success) {
+            get().getModules();
+         }
+      } catch (error) {
+         toast.error(error.response.data.message);
       }
    },
 

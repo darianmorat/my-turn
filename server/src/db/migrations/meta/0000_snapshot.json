@@ -1,5 +1,5 @@
 {
-  "id": "5d4d57c8-c74b-4717-a8f6-a733f63d29b7",
+  "id": "4936c8a5-c75f-4931-abff-729b040df50a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -81,9 +81,9 @@
           "notNull": false,
           "default": true
         },
-        "agent_name": {
-          "name": "agent_name",
-          "type": "varchar(255)",
+        "current_agent": {
+          "name": "current_agent",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -96,7 +96,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "modules_current_agent_personal_id_fk": {
+          "name": "modules_current_agent_personal_id_fk",
+          "tableFrom": "modules",
+          "tableTo": "personal",
+          "columnsFrom": [
+            "current_agent"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -171,6 +185,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "completed_by": {
+          "name": "completed_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "service_date": {
           "name": "service_date",
           "type": "date",
@@ -205,6 +225,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "turns_completed_by_personal_id_fk": {
+          "name": "turns_completed_by_personal_id_fk",
+          "tableFrom": "turns",
+          "tableTo": "personal",
+          "columnsFrom": [
+            "completed_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

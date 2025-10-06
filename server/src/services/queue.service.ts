@@ -17,6 +17,24 @@ export const queueService = {
       return queueService.createTurnForUser(user.id, user.name, user.nationalId);
    },
 
+   takeModule: async (moduleId: string, agentId: string) => {
+      const result = await db
+         .update(modules)
+         .set({ currentAgent: agentId })
+         .where(eq(modules.id, moduleId));
+
+      return result;
+   },
+
+   leaveModule: async (moduleId: string) => {
+      const result = await db
+         .update(modules)
+         .set({ currentAgent: null })
+         .where(eq(modules.id, moduleId));
+
+      return result;
+   },
+
    createTurnForUser: async (
       userId: string,
       userName: string,
@@ -156,12 +174,13 @@ export const queueService = {
       }
    },
 
-   completeTurn: async (turnId: string) => {
+   completeTurn: async (turnId: string, agentId: string) => {
       await db
          .update(turns)
          .set({
             status: "completed",
             completedAt: new Date(),
+            completedBy: agentId,
          })
          .where(eq(turns.id, turnId));
    },

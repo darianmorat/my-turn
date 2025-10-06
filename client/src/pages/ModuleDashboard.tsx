@@ -4,6 +4,7 @@ import { UserCheck, CheckCircle, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export const ModuleDashboard = () => {
    const {
@@ -14,11 +15,15 @@ export const ModuleDashboard = () => {
       callNext,
       completeTurn,
       getCurrentlyServed,
+      takeModule,
+      leaveModule,
       getModules,
       getWaitingTurns,
       getStats,
       isLoading,
    } = useQueueStore();
+
+   const { user } = useAuthStore();
 
    useEffect(() => {
       const fetchData = async () => {
@@ -44,7 +49,8 @@ export const ModuleDashboard = () => {
    };
 
    const handleComplete = async (turnId: string) => {
-      await completeTurn(turnId);
+      if (!user?.id) return;
+      await completeTurn(turnId, user.id);
    };
 
    const getModuleStatus = (moduleId: string) => {
@@ -54,6 +60,14 @@ export const ModuleDashboard = () => {
 
    const getNextInQueue = () => {
       return waitingTurns[0] || null;
+   };
+
+   const handleTakeModule = async (moduleId: string) => {
+      await takeModule(moduleId);
+   };
+
+   const handleLeaveModule = async (moduleId: string) => {
+      await leaveModule(moduleId);
    };
 
    return (
@@ -111,115 +125,160 @@ export const ModuleDashboard = () => {
 
          {/* Main Content */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {modules.map((module) => {
-               const serving = getModuleStatus(module.id);
-               const isAvailable = !serving;
-               const canCallNext = isAvailable && waitingTurns.length > 0;
+            {[...modules]
+               .sort((a, b) => a.name.localeCompare(b.name, "es", { numeric: true }))
+               .map((module) => {
+                  const serving = getModuleStatus(module.id);
+                  const isAvailable = !serving;
+                  const canCallNext = isAvailable && waitingTurns.length > 0;
 
-               return (
-                  <div
-                     key={module.id}
-                     className="bg-white dark:bg-card rounded-md shadow overflow-hidden flex flex-col justify-between"
-                  >
-                     {/* Encabezado del módulo */}
+                  const isTakenByUser = module.currentAgent === user?.id;
+                  const userHasModule = modules.some((m) => m.currentAgent === user?.id);
+                  const shouldDisable = userHasModule && !isTakenByUser;
+
+                  return (
                      <div
-                        className={`p-4 ${isAvailable ? "bg-blue-500" : "bg-green-500"} text-white`}
+                        key={module.id}
+                        className="bg-white dark:bg-card rounded-md shadow overflow-hidden flex flex-col justify-between"
                      >
-                        <div className="flex items-center justify-between">
-                           <h3 className="font-bold text-lg">{module.name}</h3>
-                           <div
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                 isAvailable ? "bg-blue-600" : "bg-green-600"
-                              }`}
-                           >
-                              {isAvailable ? "Disponible" : "Ocupado"}
-                           </div>
-                        </div>
-                        {module.description && (
-                           <p className="text-sm opacity-90 mt-1">{module.description}</p>
-                        )}
-                     </div>
-
-                     {/* Contenido del módulo */}
-                     <div className="p-6">
-                        {serving ? (
-                           <div className="space-y-4">
-                              <div className="text-center">
-                                 <div className="text-2xl font-bold text-green-600 mb-1">
-                                    {serving.ticketCode}
-                                 </div>
-                                 <div className="font-medium">{serving.user.name}</div>
-                                 <div className="text-sm text-muted-foreground">
-                                    ID: {serving.user.nationalId}
-                                 </div>
-                              </div>
-
-                              <Button
-                                 onClick={() => handleComplete(serving.id)}
-                                 disabled={isLoading}
-                                 className="w-full"
+                        {/* Encabezado del módulo */}
+                        <div
+                           className={`p-4 ${isAvailable ? "bg-blue-500" : "bg-green-500"} text-white`}
+                        >
+                           <div className="flex items-center justify-between">
+                              <h3 className="font-bold text-lg">{module.name}</h3>
+                              <div
+                                 className={`px-2 py-1 rounded text-xs font-medium ${
+                                    isAvailable ? "bg-blue-600" : "bg-green-600"
+                                 }`}
                               >
-                                 <CheckCircle size={18} />
-                                 Finalizar servicio
-                              </Button>
-
-                              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                                 <span>
-                                    Iniciado:{" "}
-                                    {new Date(serving.calledAt!).toLocaleTimeString(
-                                       "es-CO",
-                                       {
-                                          hour: "numeric",
-                                          minute: "numeric",
-                                          hour12: true,
-                                       },
-                                    )}
-                                 </span>
+                                 {isAvailable ? "Disponible" : "Ocupado"}
                               </div>
                            </div>
-                        ) : (
-                           <div>
-                              <div className="text-center mb-4">
-                                 <UserCheck
-                                    size={48}
-                                    className="mx-auto text-gray-400 dark:text-gray-600 mb-2"
-                                 />
-                                 <div className="text-gray-500 dark:text-gray-400">
-                                    Listo para el siguiente cliente
+                           {module.description && (
+                              <p className="text-sm opacity-90 mt-1">
+                                 {module.description}
+                              </p>
+                           )}
+                        </div>
+
+                        {/* Contenido del módulo */}
+                        <div className="p-6">
+                           {serving ? (
+                              <div className="space-y-4">
+                                 <div className="text-center">
+                                    <div className="text-2xl font-bold text-green-600 mb-1">
+                                       {serving.ticketCode}
+                                    </div>
+                                    <div className="font-medium">{serving.user.name}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                       ID: {serving.user.nationalId}
+                                    </div>
+                                 </div>
+
+                                 {module.currentAgent === user?.id && (
+                                    <Button
+                                       onClick={() => handleComplete(serving.id)}
+                                       disabled={isLoading}
+                                       className="w-full"
+                                    >
+                                       <CheckCircle size={18} />
+                                       Finalizar servicio
+                                    </Button>
+                                 )}
+
+                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                                    <span>
+                                       Iniciado:{" "}
+                                       {new Date(serving.calledAt!).toLocaleTimeString(
+                                          "es-CO",
+                                          {
+                                             hour: "numeric",
+                                             minute: "numeric",
+                                             hour12: true,
+                                          },
+                                       )}
+                                    </span>
                                  </div>
                               </div>
+                           ) : (
+                              <div>
+                                 <div className="text-center mb-4">
+                                    <UserCheck
+                                       size={48}
+                                       className="mx-auto text-gray-400 dark:text-gray-600 mb-2"
+                                    />
+                                    <div className="text-gray-500 dark:text-gray-400">
+                                       Listo para el siguiente cliente
+                                    </div>
+                                 </div>
 
+                                 {module.currentAgent === user?.id && (
+                                    <Button
+                                       onClick={() => handleCallNext(module.id)}
+                                       disabled={
+                                          !canCallNext || isLoading || shouldDisable
+                                       }
+                                       variant={shouldDisable ? "secondary" : "outline"}
+                                       className="w-full mb-4"
+                                    >
+                                       <Phone size={18} />
+                                       {canCallNext
+                                          ? "Llamar siguiente"
+                                          : "Nadie en espera"}
+                                    </Button>
+                                 )}
+
+                                 {canCallNext && getNextInQueue() && (
+                                    <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                                       Siguiente: {getNextInQueue()!.ticketCode} (
+                                       {getNextInQueue()!.user.name})
+                                    </div>
+                                 )}
+                              </div>
+                           )}
+                        </div>
+
+                        {/* Pie de módulo */}
+                        <div className="p-4 bg-accent/50 border-t">
+                           {module.agent ? (
+                              <div className="flex items-center gap-2 justify-center">
+                                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                 <div className="text-sm font-medium text-green-700 dark:text-green-400">
+                                    {module.agent.name}
+                                 </div>
+                              </div>
+                           ) : (
+                              <div className="space-y-2">
+                                 <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                                    - Sin agente asignado -
+                                 </div>
+                                 <Button
+                                    variant={shouldDisable ? "outline" : "default"}
+                                    onClick={() => handleTakeModule(module.id)}
+                                    disabled={shouldDisable}
+                                    className="w-full bg-blue-500 hover:bg-blue-400"
+                                    size="sm"
+                                 >
+                                    Tomar módulo
+                                 </Button>
+                              </div>
+                           )}
+
+                           {module.agent && module.currentAgent === user?.id && (
                               <Button
-                                 onClick={() => handleCallNext(module.id)}
-                                 disabled={!canCallNext || isLoading}
-                                 variant={"outline"}
-                                 className="w-full mb-4"
+                                 onClick={() => handleLeaveModule(module.id)}
+                                 variant="destructive"
+                                 className="w-full mt-2"
+                                 size="sm"
                               >
-                                 <Phone size={18} />
-                                 {canCallNext ? "Llamar siguiente" : "Nadie en espera"}
+                                 Abandonar módulo
                               </Button>
-
-                              {canCallNext && getNextInQueue() && (
-                                 <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-                                    Siguiente: {getNextInQueue()!.ticketCode} (
-                                    {getNextInQueue()!.user.name})
-                                 </div>
-                              )}
-                           </div>
-                        )}
-                     </div>
-
-                     {/* Pie de módulo */}
-                     <div className="px-4 py-2 bg-accent/50 border-t">
-                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                           {module.agentName
-                              ? `Agente: ${module.agentName}`
-                              : "Sin agente asignado"}
+                           )}
                         </div>
                      </div>
-                  </div>
-               );
-            })}
+                  );
+               })}
          </div>
       </Container>
    );

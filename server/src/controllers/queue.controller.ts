@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { queueService } from "../services/queue.service";
 import { moduleService } from "../services/module.service";
+import { AuthRequest } from "../types/auth";
+import { personalService } from "../services/personal.service";
 
 export const createTurn = async (req: Request, res: Response) => {
    try {
@@ -78,6 +80,43 @@ export const getCurrentlyServed = async (_req: Request, res: Response) => {
    }
 };
 
+export const takeModule = async (req: AuthRequest, res: Response) => {
+   try {
+      const { moduleId } = req.body;
+      const { userId } = req.user;
+
+      const personal = await personalService.findById(userId);
+      await queueService.takeModule(moduleId, personal.id);
+
+      res.status(200).json({
+         success: true,
+         message: "Módulo tomado",
+      });
+   } catch {
+      res.status(500).json({
+         success: false,
+         message: "Error tomando el módulo",
+      });
+   }
+};
+
+export const leaveModule = async (req: Request, res: Response) => {
+   try {
+      const { moduleId } = req.body;
+      await queueService.leaveModule(moduleId);
+
+      res.status(200).json({
+         success: true,
+         message: "Módulo abandonnado",
+      });
+   } catch {
+      res.status(500).json({
+         success: false,
+         message: "Error abandonando el módulo",
+      });
+   }
+};
+
 export const callNext = async (req: Request, res: Response) => {
    try {
       const { moduleId } = req.body;
@@ -114,6 +153,7 @@ export const callNext = async (req: Request, res: Response) => {
 
 export const completeTurn = async (req: Request, res: Response) => {
    try {
+      const { agentId } = req.body;
       const { turnId } = req.params;
 
       if (!turnId) {
@@ -123,7 +163,7 @@ export const completeTurn = async (req: Request, res: Response) => {
          });
       }
 
-      await queueService.completeTurn(turnId);
+      await queueService.completeTurn(turnId, agentId);
 
       res.status(200).json({
          success: true,

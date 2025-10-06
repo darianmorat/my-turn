@@ -4,7 +4,11 @@ import { modules } from "../db/schema";
 
 export const moduleService = {
    getAll: async () => {
-      const result = await db.select().from(modules);
+      const result = await db.query.modules.findMany({
+         with: {
+            agent: true,
+         },
+      });
 
       return result;
    },

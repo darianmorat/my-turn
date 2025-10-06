@@ -2,6 +2,7 @@ import { pgEnum, uuid, varchar, pgTable, timestamp, date } from "drizzle-orm/pg-
 import { sql, relations } from "drizzle-orm";
 import { users } from "./users";
 import { modules } from "./modules";
+import { personal } from "./personal";
 
 export const turnStatusEnum = pgEnum("turn_status", [
    "waiting",
@@ -27,6 +28,9 @@ export const turns = pgTable("turns", {
    createdAt: timestamp("created_at").defaultNow(),
    calledAt: timestamp("called_at"), // When assigned to module
    completedAt: timestamp("completed_at"), // When service finished
+
+   // agent
+   completedBy: uuid("completed_by").references(() => personal.id),
 
    // Daily tracking
    serviceDate: date("service_date").defaultNow(),
