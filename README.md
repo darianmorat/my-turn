@@ -2,7 +2,7 @@
 
 Official website for **My Turn**
 
-> [Visit Live Website](https://my-turn.vercel.app)
+> [Visit Live Website](https://my-turn-pi.vercel.app)
 
 ## Features
 
