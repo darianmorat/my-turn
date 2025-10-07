@@ -28,19 +28,17 @@ export const createTurn = async (req: Request, res: Response) => {
             success: false,
             message: "Ya tienes un turno activo",
          });
-      }
-
-      if (error.message === "Usuario no encontrado") {
+      } else if (error.message === "Usuario no encontrado") {
          return res.status(404).json({
             success: false,
             message: "Usuario no encontrado",
          });
+      } else {
+         res.status(500).json({
+            success: false,
+            message: "Error del servidor",
+         });
       }
-
-      res.status(500).json({
-         success: false,
-         message: "Error del servidor",
-      });
    }
 };
 

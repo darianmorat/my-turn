@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/Container";
 import { TimerWatch } from "@/components/TimerWatch";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { GoBackBtn } from "@/components/GoBackBtn";
 
 export const ModuleDashboard = () => {
    const {
@@ -77,7 +78,8 @@ export const ModuleDashboard = () => {
    return (
       <Container className="space-y-6">
          {/* Header */}
-         <div>
+         <div className="relative">
+            {user?.role === "admin" && <GoBackBtn />}
             <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
                Panel de Gestión de Módulos
             </h1>

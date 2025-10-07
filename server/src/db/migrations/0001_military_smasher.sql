@@ -1,0 +1,1 @@
+ALTER TABLE "turns" ADD COLUMN "completed_by_name" varchar;

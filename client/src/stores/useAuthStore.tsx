@@ -104,7 +104,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       const timer = setInterval(() => {
          countdown--;
-         console.log(countdown);
 
          if (countdown <= 0) {
             clearInterval(timer);

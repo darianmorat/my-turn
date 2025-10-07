@@ -31,6 +31,7 @@ export const turns = pgTable("turns", {
 
    // agent
    completedBy: uuid("completed_by").references(() => personal.id),
+   completedByName: varchar("completed_by_name"),
 
    // Daily tracking
    serviceDate: date("service_date").defaultNow(),

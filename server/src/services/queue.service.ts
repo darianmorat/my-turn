@@ -1,6 +1,6 @@
 import { asc, eq, sql, and, or } from "drizzle-orm";
 import { db } from "../db";
-import { modules, queue, turns, users } from "../db/schema";
+import { modules, personal, queue, turns, users } from "../db/schema";
 
 export const queueService = {
    createTurn: async (nationalId: string) => {
@@ -152,12 +152,21 @@ export const queueService = {
    },
 
    completeTurn: async (turnId: string, agentId: string) => {
+      const agentData = await db
+         .select({ name: personal.name })
+         .from(personal)
+         .where(eq(personal.id, agentId));
+
+      const agent = agentData[0];
+      if (!agent) throw new Error("Agent not found");
+
       await db
          .update(turns)
          .set({
             status: "completed",
             completedAt: new Date(),
             completedBy: agentId,
+            completedByName: agent.name,
          })
          .where(eq(turns.id, turnId));
    },

@@ -11,6 +11,8 @@ import { TimerWatch } from "@/components/TimerWatch";
 import { Modal } from "@/components/Modal";
 import type { User } from "@/types/user";
 import type { Turn } from "@/types/queue";
+import { GoBackBtn } from "@/components/GoBackBtn";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const userFormSchema = z.object({
    name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -30,6 +32,7 @@ export const ReceptionInterface = () => {
    const [selectedTurn, setSelectedTurn] = useState<Turn | null>(null);
    const [searchTerm, setSearchTerm] = useState("");
 
+   const { user } = useAuthStore();
    const { isLoading: isUserLoading, users, getUsers, createUser } = useUserStore();
    const {
       waitingTurns,
@@ -103,6 +106,7 @@ export const ReceptionInterface = () => {
       <Container className="space-y-6">
          {/* Header */}
          <div>
+            {user?.role === "admin" && <GoBackBtn />}
             <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
                Interfaz de Recepción
             </h1>

@@ -5,6 +5,7 @@ import { TimerWatch } from "@/components/TimerWatch";
 import { PersonalSection } from "@/components/dasboard/Personal/Personal";
 import { UserSection } from "@/components/dasboard/Users/User";
 import { ModuleSection } from "@/components/dasboard/Modules/Module";
+import { GoBackBtn } from "@/components/GoBackBtn";
 
 export const Dashboard = () => {
    const { tab } = useParams<{ tab?: string }>();
@@ -33,7 +34,7 @@ export const Dashboard = () => {
          case "personal":
             return <PersonalSection />;
          case "modulos":
-            return <ModuleSection />; 
+            return <ModuleSection />;
          case "usuarios":
             return <UserSection />;
          default:
@@ -44,7 +45,8 @@ export const Dashboard = () => {
    return (
       <div className="flex-1">
          <Container>
-            <div>
+            <div className="relative">
+               <GoBackBtn />
                <h1 className="text-2xl font-bold text-card-foreground mb-4 text-center">
                   Panel de Administración
                </h1>
