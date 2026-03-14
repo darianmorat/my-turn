@@ -23,6 +23,19 @@ const turnFormSchema = z.object({
    nationalId: z.string().min(5, "La cédula debe tener al menos 5 caracteres"),
 });
 
+const turnServiceTypes = [
+   { value: "", label: "Selecciona un servicio" },
+   { value: "actualizacion_datos_personales", label: "Actualización datos personales" },
+   { value: "soporte_hoja_vida", label: "Soporte hoja de vida" },
+   { value: "consultar_cursos", label: "Consultar cursos" },
+   { value: "orientacion_v", label: "Orientación V" },
+   { value: "empresas", label: "Empresas" },
+   { value: "orientacion_pcd", label: "Orientación PCD" },
+   { value: "asesoria_hidrocarburos", label: "Asesoría de hidrocarburos" },
+   { value: "transnacional", label: "Transnacional" },
+   { value: "postulaciones", label: "Postulaciones" },
+];
+
 type UserFormData = z.infer<typeof userFormSchema>;
 type TurnFormData = z.infer<typeof turnFormSchema>;
 
@@ -31,6 +44,7 @@ export const ReceptionInterface = () => {
    const [selectedUser, setSelectedUser] = useState<User | null>(null);
    const [selectedTurn, setSelectedTurn] = useState<Turn | null>(null);
    const [searchTerm, setSearchTerm] = useState("");
+   const [selectedService, setSelectedService] = useState("");
 
    const { user } = useAuthStore();
    const { isLoading: isUserLoading, users, getUsers, createUser } = useUserStore();
@@ -91,7 +105,13 @@ export const ReceptionInterface = () => {
    );
 
    const handleModal = (modal: string): void => {
-      setShowModal((prev) => ({ active: !prev.active, for: modal }));
+      const isOpening = modal !== "";
+      setShowModal({ active: isOpening, for: modal });
+
+      if (!isOpening) {
+         setSelectedService("");
+         turnForm.reset();
+      }
    };
 
    const handleCancelTurn = async () => {
@@ -374,8 +394,19 @@ export const ReceptionInterface = () => {
                         )}
                      </div>
                      <div>
-                        <select name="" id="">
-                           <option value="">Actualización datos personales</option>
+                        <label className="block text-sm font-medium mb-1">
+                           Motivo / Servicio
+                        </label>
+                        <select
+                           value={selectedService}
+                           onChange={(e) => setSelectedService(e.target.value)}
+                           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-background text-foreground"
+                        >
+                           {turnServiceTypes.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                 {option.label}
+                              </option>
+                           ))}
                         </select>
                      </div>
 
