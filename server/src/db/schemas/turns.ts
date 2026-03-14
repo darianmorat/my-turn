@@ -18,6 +18,7 @@ export const turns = pgTable("turns", {
    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
    userName: varchar("user_name").notNull(),
    userNationalId: varchar("user_national_id").notNull(),
+   serviceType: varchar("service_type"),
 
    // Modules
    moduleId: uuid("module_id").references(() => modules.id, { onDelete: "cascade" }),

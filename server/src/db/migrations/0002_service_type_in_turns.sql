@@ -1,0 +1,1 @@
+ALTER TABLE "turns" ADD COLUMN "service_type" varchar;

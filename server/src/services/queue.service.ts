@@ -3,7 +3,7 @@ import { db } from "../db";
 import { modules, personal, queue, turns, users } from "../db/schema";
 
 export const queueService = {
-   createTurn: async (nationalId: string) => {
+   createTurn: async (nationalId: string, serviceType?: string) => {
       const [user] = await db
          .select()
          .from(users)
@@ -29,7 +29,12 @@ export const queueService = {
          throw new Error("Ya tienes un turno activo");
       }
 
-      return queueService.createTurnForUser(user.id, user.name, user.nationalId);
+      return queueService.createTurnForUser(
+         user.id,
+         user.name,
+         user.nationalId,
+         serviceType,
+      );
    },
 
    takeModule: async (moduleId: string, agentId: string) => {
@@ -54,6 +59,7 @@ export const queueService = {
       userId: string,
       userName: string,
       userNationalId: string,
+      serviceType?: string,
    ) => {
       const today = new Date().toISOString().split("T")[0];
 
@@ -92,6 +98,7 @@ export const queueService = {
             userId,
             userName,
             userNationalId,
+            serviceType,
             ticketCode,
             status: "waiting",
             serviceDate: today,

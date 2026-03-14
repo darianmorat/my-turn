@@ -12,7 +12,7 @@ type QueueStore = {
    isLoading: boolean;
 
    // Reception actions
-   createTurn: (nationalId: string) => Promise<Turn | null>;
+   createTurn: (nationalId: string, serviceType: string) => Promise<Turn | null>;
    cancelTurn: (turnId: string) => Promise<void>;
    getWaitingTurns: () => Promise<void>;
    getStats: () => Promise<void>;
@@ -45,10 +45,10 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
    isLoading: false,
 
    // Reception actions
-   createTurn: async (nationalId: string) => {
+   createTurn: async (nationalId: string, serviceType: string) => {
       set({ isLoading: true });
       try {
-         const body = { nationalId: nationalId };
+         const body = { nationalId: nationalId, serviceType };
          const res = await api.post("/queue/create", body);
          const turn = res.data.turn;
 

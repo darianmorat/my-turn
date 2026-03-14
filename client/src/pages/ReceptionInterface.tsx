@@ -21,6 +21,7 @@ const userFormSchema = z.object({
 
 const turnFormSchema = z.object({
    nationalId: z.string().min(5, "La cédula debe tener al menos 5 caracteres"),
+   serviceType: z.string().min(1, "Seleccione un motivo"),
 });
 
 const turnServiceTypes = [
@@ -44,7 +45,6 @@ export const ReceptionInterface = () => {
    const [selectedUser, setSelectedUser] = useState<User | null>(null);
    const [selectedTurn, setSelectedTurn] = useState<Turn | null>(null);
    const [searchTerm, setSearchTerm] = useState("");
-   const [selectedService, setSelectedService] = useState("");
 
    const { user } = useAuthStore();
    const { isLoading: isUserLoading, users, getUsers, createUser } = useUserStore();
@@ -91,7 +91,7 @@ export const ReceptionInterface = () => {
    };
 
    const onCreateTurn = async (data: TurnFormData) => {
-      const turn = await createTurn(data.nationalId);
+      const turn = await createTurn(data.nationalId, data.serviceType);
 
       if (turn) {
          handleModal("");
@@ -109,7 +109,6 @@ export const ReceptionInterface = () => {
       setShowModal({ active: isOpening, for: modal });
 
       if (!isOpening) {
-         setSelectedService("");
          turnForm.reset();
       }
    };
@@ -398,8 +397,7 @@ export const ReceptionInterface = () => {
                            Motivo / Servicio
                         </label>
                         <select
-                           value={selectedService}
-                           onChange={(e) => setSelectedService(e.target.value)}
+                           {...turnForm.register("serviceType")}
                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-background text-foreground"
                         >
                            {turnServiceTypes.map((option) => (
@@ -408,6 +406,11 @@ export const ReceptionInterface = () => {
                               </option>
                            ))}
                         </select>
+                        {turnForm.formState.errors.serviceType && (
+                           <p className="text-red-500 text-sm mt-1">
+                              {turnForm.formState.errors.serviceType.message}
+                           </p>
+                        )}
                      </div>
 
                      <Button type="submit" disabled={isLoading} className="w-full">

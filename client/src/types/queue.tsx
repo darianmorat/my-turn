@@ -18,6 +18,7 @@ export type Turn = {
    moduleId?: string;
    ticketCode: string;
    status: TurnStatus;
+   serviceType?: string;
 
    createdAt: string;
    calledAt?: string;
