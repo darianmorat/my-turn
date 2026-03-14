@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { jwtGenerator } from "../utils/jwtGenerator";
 import { clearCookie, setCookie } from "../utils/setCookie";
 import { AuthRequest } from "../types/auth";
-import { compare } from "bcrypt-ts";
 import { personalService } from "../services/personal.service";
 
 export const authenticate = async (req: Request, res: Response) => {
@@ -21,6 +20,7 @@ export const authenticate = async (req: Request, res: Response) => {
 
       if (!password) return;
 
+      const { compare } = await import("bcrypt-ts");
       const hash = user.password;
       const isValid = await compare(password, hash);
 

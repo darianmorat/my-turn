@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { personal } from "../db/schema";
-import { genSalt, hash } from "bcrypt-ts";
 
 export const personalService = {
    findForAuth: async (email: string) => {
@@ -51,6 +50,7 @@ export const personalService = {
       password: string,
       role: "admin" | "agent" | "receptionist",
    ) => {
+      const { genSalt, hash } = await import("bcrypt-ts");
       const salt = await genSalt(10);
       const hashedPassword = await hash(password, salt);
 
@@ -86,6 +86,7 @@ export const personalService = {
       }
 
       if (updates.password !== undefined && updates.password.trim() !== "") {
+         const { genSalt, hash } = await import("bcrypt-ts");
          const salt = await genSalt(10);
          const hashedPassword = await hash(updates.password, salt);
          updateData.password = hashedPassword;

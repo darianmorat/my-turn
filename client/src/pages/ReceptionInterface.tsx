@@ -375,7 +375,7 @@ export const ReceptionInterface = () => {
                      </div>
                      <div>
                         <select name="" id="">
-                           <option value="">Actualización de datos personales</option>
+                           <option value="">Actualización datos personales</option>
                         </select>
                      </div>
 
