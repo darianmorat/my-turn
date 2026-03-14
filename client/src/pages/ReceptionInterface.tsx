@@ -373,6 +373,11 @@ export const ReceptionInterface = () => {
                            </p>
                         )}
                      </div>
+                     <div>
+                        <select name="" id="">
+                           <option value="">Actualización de datos personales</option>
+                        </select>
+                     </div>
 
                      <Button type="submit" disabled={isLoading} className="w-full">
                         {isLoading && <LoaderCircle className="animate-spin" />}
