@@ -112,22 +112,65 @@ export const ModuleDashboard = () => {
             </div>
          </div>
 
-         {/* Siguiente en la cola */}
-         {getNextInQueue() && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-md p-4 mb-6">
-               <div className="flex items-center gap-3">
-                  <Users className="text-yellow-600 dark:text-yellow-400" size={24} />
-                  <div>
-                     <div className="font-semibold text-yellow-800 dark:text-yellow-300">
-                        Siguiente en la cola:
+         {/* Siguientes en la cola */}
+         {waitingTurns.length > 0 &&
+            (() => {
+               const last3 = waitingTurns.slice(0, 3).reverse();
+               const next = waitingTurns[0];
+               return (
+                  <div className="bg-card border rounded-md shadow p-5 mb-6">
+                     <div className="flex items-center gap-2 mb-4">
+                        <Users className="text-muted-foreground" size={18} />
+                        <span className="font-semibold text-card-foreground text-sm uppercase tracking-wide">
+                           Últimos en la cola
+                        </span>
+                        <span className="ml-auto bg-blue-500 dark:bg-blue-600/50 text-white text-xs px-2 py-0.5 rounded-sm">
+                           {waitingTurns.length} en espera
+                        </span>
                      </div>
-                     <div className="text-sm text-yellow-600 dark:text-yellow-400">
-                        {getNextInQueue()!.user.name} - {getNextInQueue()!.ticketCode}
+                     <div className="flex flex-col gap-2">
+                        {last3.map((turn) => {
+                           const isNext = turn.id === next.id;
+                           return (
+                              <div
+                                 key={turn.id}
+                                 className={`flex items-center justify-between rounded-md px-4 py-2.5 transition-all border ${
+                                    isNext
+                                       ? "bg-primary/10 border-primary/30 shadow-sm"
+                                       : "bg-accent/40 border-grey/10 opacity-90"
+                                 }`}
+                              >
+                                 <div className="flex items-center gap-3">
+                                    {isNext && (
+                                       <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    )}
+                                    <span
+                                       className={`text-sm ${isNext ? "font-semibold text-card-foreground" : "text-muted-foreground"}`}
+                                    >
+                                       {turn.user.name}
+                                    </span>
+                                    <span
+                                       className={`text-xs px-1.5 py-0.5 rounded font-mono ${isNext ? "bg-primary/20 text-primary" : "bg-accent text-muted-foreground"}`}
+                                    >
+                                       {turn.ticketCode}
+                                    </span>
+                                 </div>
+                                 <span
+                                    className={`text-sm font-medium px-2.5 py-1 rounded-sm ${
+                                       isNext
+                                          ? "bg-primary/20 text-primary"
+                                          : "bg-accent text-muted-foreground"
+                                    }`}
+                                 >
+                                    # {turn.serviceType}
+                                 </span>
+                              </div>
+                           );
+                        })}
                      </div>
                   </div>
-               </div>
-            </div>
-         )}
+               );
+            })()}
 
          {/* Main Content */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

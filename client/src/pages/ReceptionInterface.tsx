@@ -26,15 +26,15 @@ const turnFormSchema = z.object({
 
 const turnServiceTypes = [
    { value: "", label: "Selecciona un servicio" },
-   { value: "actualizacion_datos_personales", label: "Actualización datos personales" },
-   { value: "soporte_hoja_vida", label: "Soporte hoja de vida" },
-   { value: "consultar_cursos", label: "Consultar cursos" },
-   { value: "orientacion_v", label: "Orientación V" },
-   { value: "empresas", label: "Empresas" },
-   { value: "orientacion_pcd", label: "Orientación PCD" },
-   { value: "asesoria_hidrocarburos", label: "Asesoría de hidrocarburos" },
-   { value: "transnacional", label: "Transnacional" },
-   { value: "postulaciones", label: "Postulaciones" },
+   { value: "Actualización datos personales", label: "Actualización datos personales" },
+   { value: "Soporte hoja de vida", label: "Soporte hoja de vida" },
+   { value: "Consultar cursos", label: "Consultar cursos" },
+   { value: "Orientación V", label: "Orientación V" },
+   { value: "Empresas", label: "Empresas" },
+   { value: "Orientación PCD", label: "Orientación PCD" },
+   { value: "Asesoría de hidrocarburos", label: "Asesoría de hidrocarburos" },
+   { value: "Transnacional", label: "Transnacional" },
+   { value: "Postulaciones", label: "Postulaciones" },
 ];
 
 type UserFormData = z.infer<typeof userFormSchema>;

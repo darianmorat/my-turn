@@ -3,7 +3,7 @@ import { db } from "../db";
 import { modules, personal, queue, turns, users } from "../db/schema";
 
 export const queueService = {
-   createTurn: async (nationalId: string, serviceType?: string) => {
+   createTurn: async (nationalId: string, serviceType: string) => {
       const [user] = await db
          .select()
          .from(users)
@@ -59,7 +59,7 @@ export const queueService = {
       userId: string,
       userName: string,
       userNationalId: string,
-      serviceType?: string,
+      serviceType: string,
    ) => {
       const today = new Date().toISOString().split("T")[0];
 

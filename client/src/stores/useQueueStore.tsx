@@ -48,7 +48,7 @@ export const useQueueStore = create<QueueStore>((set, get) => ({
    createTurn: async (nationalId: string, serviceType: string) => {
       set({ isLoading: true });
       try {
-         const body = { nationalId: nationalId, serviceType };
+         const body = { nationalId: nationalId, serviceType: serviceType };
          const res = await api.post("/queue/create", body);
          const turn = res.data.turn;
 
