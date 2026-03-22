@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowRight, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useQueueStore } from "@/stores/useQueueStore";
 import { Container } from "@/components/Container";
 import { SoundUnlocker } from "@/components/SoundUnlocker";
