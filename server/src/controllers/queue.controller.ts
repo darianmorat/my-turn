@@ -6,7 +6,7 @@ import { personalService } from "../services/personal.service";
 
 export const createTurn = async (req: Request, res: Response) => {
    try {
-      const { nationalId } = req.body;
+      const { nationalId, serviceType } = req.body;
 
       if (!nationalId) {
          return res.status(400).json({
@@ -15,7 +15,7 @@ export const createTurn = async (req: Request, res: Response) => {
          });
       }
 
-      const turn = await queueService.createTurn(nationalId);
+      const turn = await queueService.createTurn(nationalId, serviceType);
 
       res.status(200).json({
          success: true,

@@ -180,6 +180,9 @@ export const ModuleDashboard = () => {
                                     <div className="text-sm text-muted-foreground">
                                        ID: {serving.user.nationalId}
                                     </div>
+                                    <div className="text-sm text-muted-foreground">
+                                       Servicio: {serving.serviceType ?? "-"}
+                                    </div>
                                  </div>
 
                                  {module.currentAgent === user?.id && (
