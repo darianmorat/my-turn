@@ -189,7 +189,7 @@ export const QueueDisplayBoard = () => {
          {/* Próximos en la Cola */}
          <div className="bg-card rounded-md shadow p-6 mb-6 border">
             <h2 className="text-lg font-semibold mb-6 text-card-foreground">
-               Próximos a Ser Llamados
+               Bienvenidos Usuarios
             </h2>
 
             {nextTurns.length === 0 ? (
@@ -217,19 +217,9 @@ export const QueueDisplayBoard = () => {
                            <div className="text-base text-card-foreground mb-2">
                               {turn.user.name}
                            </div>
-
-                           {turn.predictedModule ? (
-                              <div className="flex items-center justify-center gap-2 bg-muted rounded-md p-2 text-sm text-muted-foreground">
-                                 <ArrowRight size={16} />
-                                 <span className="font-semibold">
-                                    {turn.predictedModule.name}
-                                 </span>
-                              </div>
-                           ) : (
-                              <div className="bg-muted rounded-md p-2 text-sm text-muted-foreground">
-                                 Esperando un módulo disponible
-                              </div>
-                           )}
+                           <div className="text-md font-medium text-yellow-700">
+                              # {turn.serviceType}
+                           </div>
                         </div>
                      </div>
                   ))}

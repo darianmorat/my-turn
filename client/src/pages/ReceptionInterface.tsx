@@ -273,6 +273,9 @@ export const ReceptionInterface = () => {
                                     <div className="text-sm font-medium text-foreground">
                                        {turn.user.name}
                                     </div>
+                                    <div className="text-sm font-medium text-yellow-700">
+                                       # {turn.serviceType}
+                                    </div>
                                  </div>
                                  <div className="flex items-center gap-2">
                                     {index === 0 && (
